@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "65700282049",
+    "project_id": "applyingpressure-a0205",
+    "storage_bucket": "applyingpressure-a0205.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65700282049:android:43744ac8d4df454a915e40",
+        "android_client_info": {
+          "package_name": "com.garrytech.applying_pressure"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "65700282049-lcuv1b9s265mnv22nfb9eqhjuect1545.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBN3C-Y7z7v_xJfTp8CVwxuQvTjtYYbtq8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "65700282049-lcuv1b9s265mnv22nfb9eqhjuect1545.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "65700282049-5h5kl8gvem22r7utk6tirhlf0qt107kf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.garrytech.applyingPressure"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65700282049:android:5eb2f2f603336cc6915e40",
+        "android_client_info": {
+          "package_name": "com.garrytech.applyingpressure"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "65700282049-lcuv1b9s265mnv22nfb9eqhjuect1545.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBN3C-Y7z7v_xJfTp8CVwxuQvTjtYYbtq8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "65700282049-lcuv1b9s265mnv22nfb9eqhjuect1545.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "65700282049-5h5kl8gvem22r7utk6tirhlf0qt107kf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.garrytech.applyingPressure"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
