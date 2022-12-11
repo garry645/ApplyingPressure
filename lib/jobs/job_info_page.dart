@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 class JobInfoPage extends StatelessWidget {
   // In the constructor, require a Job.
   const JobInfoPage({super.key});
-
-  // Declare a field that holds the Job.
-  //final Job job;
+  static const routeName = '/jobInfoPage';
 
   @override
   Widget build(BuildContext context) {
+    final job = ModalRoute.of(context)!.settings.arguments as Job;
     // Use the Job to create the UI.
     return Scaffold(
       appBar: AppBar(
@@ -17,7 +16,7 @@ class JobInfoPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        //child: Text(job.title),
+        child: Text(job.title),
       ),
     );
   }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ExpensesPage extends StatefulWidget {
-  const ExpensesPage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const ExpensesPage({Key? key}) : super(key: key);
+  final String title = "Expenses";
+  static const routeName = '/expensesListPage';
 
   @override
   State<ExpensesPage> createState() => _ExpensesPageState();

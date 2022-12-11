@@ -1,11 +1,12 @@
-import 'package:applying_pressure/customers/customers_page.dart';
-import 'package:applying_pressure/expenses/expenses_page.dart';
-import 'package:applying_pressure/jobs/jobs_list_page.dart';
 import 'package:flutter/material.dart';
 
+import '../customers/customers_page.dart';
+import '../expenses/expenses_page.dart';
+import '../jobs/jobs_list_page.dart';
+
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const HomePage({Key? key}) : super(key: key);
+  static const routeName = '/';
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -13,9 +14,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static const List<Widget> _pages = <Widget>[
-    JobsListPage(title: "Jobs"),
-    CustomersPage(title: "Customers"),
-    ExpensesPage(title: "Expenses")
+    JobsListPage(),
+    CustomersPage(),
+    ExpensesPage()
   ];
 
   int _selectedIndex = 0;
@@ -23,9 +24,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _pages.elementAt(_selectedIndex),
-      ),
+      body: Center(child: _pages.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Jobs"),

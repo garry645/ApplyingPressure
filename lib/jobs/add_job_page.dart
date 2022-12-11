@@ -5,6 +5,7 @@ import 'job.dart';
 
 class AddJobPage extends StatefulWidget {
   const AddJobPage({super.key});
+  static const routeName = '/addJobPage';
 
   @override
   State<AddJobPage> createState() => _AddJobPageState();

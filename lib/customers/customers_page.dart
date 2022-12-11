@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomersPage extends StatefulWidget {
-  const CustomersPage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const CustomersPage({Key? key}) : super(key: key);
+  final String title = "Customers";
+  static const routeName = '/customersListPage';
 
   @override
   State<CustomersPage> createState() => _CustomersPageState();

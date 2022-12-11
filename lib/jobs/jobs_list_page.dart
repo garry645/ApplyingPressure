@@ -1,13 +1,15 @@
+import 'package:applying_pressure/jobs/add_job_page.dart';
 import 'package:applying_pressure/jobs/job_info_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../database_service.dart';
 import 'job.dart';
 
 class JobsListPage extends StatefulWidget {
-  const JobsListPage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const JobsListPage({Key? key}) : super(key: key);
+  final String title = "Jobs";
+
+  static const routeName = '/jobsListPage';
 
   @override
   State<JobsListPage> createState() => _JobsListPageState();
@@ -45,62 +47,13 @@ class _JobsListPageState extends State<JobsListPage> {
               if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 return ListView.separated(
                     itemCount: retrievedJobList!.length,
-                    separatorBuilder: (context, index) => const SizedBox(
-                          height: 10,
-                        ),
+                    separatorBuilder: (context, index) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      return Dismissible(
-                        onDismissed: ((direction) async {
-                          await service.deleteJob(
-                              retrievedJobList![index].id.toString());
-                          //_dismiss();
-                        }),
-                        background: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(16.0)),
-                          padding: const EdgeInsets.only(right: 28.0),
-                          alignment: AlignmentDirectional.centerEnd,
-                          child: const Text(
-                            "DELETE",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        direction: DismissDirection.endToStart,
-                        resizeDuration: const Duration(milliseconds: 200),
-                        key: UniqueKey(),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 83, 80, 80),
-                              borderRadius: BorderRadius.circular(16.0)),
-                          child: ListTile(
-                            onTap: () {
-                              Navigator.pushNamed(context, "/edit",
-                                  arguments: retrievedJobList![index]);
-                            },
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            title: Text(retrievedJobList![index].title),
-                            subtitle:
-                                Text("${retrievedJobList![index].startDate}, "
-                                    "${retrievedJobList![index].startDate}"),
-                            trailing: const Icon(Icons.arrow_right_sharp),
-                          ),
-                        ),
-                      );
+                      return createDismissable(retrievedJobList?[index]);
                     });
               } else if (snapshot.connectionState == ConnectionState.done &&
                   retrievedJobList!.isEmpty) {
-                return Center(
-                  child: ListView(
-                    children: const <Widget>[
-                      Align(
-                          alignment: AlignmentDirectional.center,
-                          child: Text('No data available')),
-                    ],
-                  ),
-                );
+                return createEmptyState();
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
@@ -110,7 +63,7 @@ class _JobsListPageState extends State<JobsListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.pushNamed(context, '/add');
+          Navigator.pushNamed(context, AddJobPage.routeName);
         }),
         tooltip: 'add',
         child: const Icon(Icons.add),
@@ -118,34 +71,55 @@ class _JobsListPageState extends State<JobsListPage> {
     );
   }
 
-  Widget makeListTile(QueryDocumentSnapshot? document) {
-    return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-      leading: Container(
-        padding: const EdgeInsets.all(5.0),
-        child: Text(
-          document?['startDate'] ?? "loading",
+  Widget createEmptyState() {
+    return Center(
+      child: ListView(
+        children: const <Widget>[
+          Align(
+              alignment: AlignmentDirectional.center,
+              child: Text('No data available')),
+        ],
+      ),
+    );
+  }
+
+  Widget createDismissable(Job? job) {
+    return Dismissible(
+        onDismissed: ((direction) async {
+          await service.deleteJob(
+              job?.id.toString() ?? "");
+        }),
+        background: Container(
+          decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(5)),
+          padding: const EdgeInsets.only(right: 28.0),
+          alignment: AlignmentDirectional.centerEnd,
+          child: const Text(
+            "DELETE",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
-      ),
-      title: Text(
-        document?['title'] ?? "loading",
-      ),
+        direction: DismissDirection.endToStart,
+        resizeDuration: const Duration(milliseconds: 200),
+        key: UniqueKey(),
+        child: makeListTile(job)
+    );
+  }
+
+  Widget makeListTile(Job? job) {
+    return ListTile(
+      onTap: () {
+        Navigator.pushNamed(context, JobInfoPage.routeName, arguments: job);
+      },
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: Colors.black, width: 1),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      trailing: Icon(Icons.keyboard_arrow_right,
-          color: Colors.grey.shade900, size: 30.0),
-      /*onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => JobInfoPage(
-                  job: Job.fromDocumentSnapshot(document)),
-            ),
-          );
-        }*/
+          side: const BorderSide(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(5)),
+      title: Text(job?.title ?? ""),
+      subtitle:
+      Text("${job?.startDate ?? "stdte"} "
+          "${job?.title ?? "sffed"}"),
+      trailing: const Icon(Icons.arrow_right_sharp),
     );
   }
 }
