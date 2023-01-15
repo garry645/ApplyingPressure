@@ -1,25 +1,23 @@
-import 'package:applying_pressure/jobs/add_job_page.dart';
-import 'package:applying_pressure/jobs/job_info_page.dart';
-import 'package:applying_pressure/widgets/app_bar.dart';
+import 'package:applying_pressure/expenses/expense.dart';
+import 'package:applying_pressure/expenses/expense_info_page.dart';
 import 'package:flutter/material.dart';
 
 import '../database_service.dart';
-import 'job.dart';
+import 'add_expense_page.dart';
 
-class JobsListPage extends StatefulWidget {
-  const JobsListPage({Key? key}) : super(key: key);
-  final String title = "Jobs";
-
-  static const routeName = '/jobsListPage';
+class ExpensesListPage extends StatefulWidget {
+  const ExpensesListPage({Key? key}) : super(key: key);
+  final String title = "ExpensesList";
+  static const routeName = '/expensesListPage';
 
   @override
-  State<JobsListPage> createState() => _JobsListPageState();
+  State<ExpensesListPage> createState() => _ExpensesListPageState();
 }
 
-class _JobsListPageState extends State<JobsListPage> {
+class _ExpensesListPageState extends State<ExpensesListPage> {
   DatabaseService service = DatabaseService();
-  Future<List<Job>>? jobList;
-  List<Job> retrievedJobList = [];
+  Future<List<Expense>>? expenseList;
+  List<Expense> retrievedExpenseList = [];
 
   @override
   void initState() {
@@ -28,30 +26,33 @@ class _JobsListPageState extends State<JobsListPage> {
   }
 
   Future<void> _initRetrieval() async {
-    jobList = service.retrieveJobs();
-    retrievedJobList = await service.retrieveJobs();
+    expenseList = service.retrieveExpenses();
+    retrievedExpenseList = await service.retrieveExpenses();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const APAppBar(title: 'Jobs'),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       body: RefreshIndicator(
         onRefresh: _initRetrieval,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: FutureBuilder(
-            future: jobList,
-            builder: (BuildContext context, AsyncSnapshot<List<Job>> snapshot) {
+            future: expenseList,
+            builder: (BuildContext context, AsyncSnapshot<List<Expense>> snapshot) {
               if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 return ListView.separated(
-                    itemCount: retrievedJobList.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 10),
+                    itemCount: retrievedExpenseList.length,
+                    separatorBuilder: (context, index) =>
+                    const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      return createDismisable(retrievedJobList[index]);
+                      return createDismisable(retrievedExpenseList[index]);
                     });
               } else if (snapshot.connectionState == ConnectionState.done
-                  && retrievedJobList.isEmpty) {
+                  && retrievedExpenseList.isEmpty) {
                 return createEmptyState();
               } else {
                 return const Center(child: CircularProgressIndicator());
@@ -62,7 +63,7 @@ class _JobsListPageState extends State<JobsListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.pushNamed(context, AddJobPage.routeName);
+          Navigator.pushNamed(context, AddExpensePage.routeName);
         }),
         tooltip: 'add',
         child: const Icon(Icons.add),
@@ -82,11 +83,11 @@ class _JobsListPageState extends State<JobsListPage> {
     );
   }
 
-  Widget createDismisable(Job? job) {
+  Widget createDismisable(Expense? expense) {
     return Dismissible(
         onDismissed: ((direction) async {
-          await service.deleteJob(
-              job?.id.toString() ?? "");
+          await service.deleteExpense(
+              expense?.id.toString() ?? "");
         }),
         background: Container(
           decoration: BoxDecoration(
@@ -102,22 +103,21 @@ class _JobsListPageState extends State<JobsListPage> {
         direction: DismissDirection.endToStart,
         resizeDuration: const Duration(milliseconds: 200),
         key: UniqueKey(),
-        child: makeListTile(job)
+        child: makeListTile(expense)
     );
   }
 
-  Widget makeListTile(Job? job) {
+  Widget makeListTile(Expense? expense) {
     return ListTile(
       onTap: () {
-        Navigator.pushNamed(context, JobInfoPage.routeName, arguments: job);
+        Navigator.pushNamed(context, ExpenseInfoPage.routeName, arguments: expense);
       },
       shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
-      title: Text(job?.title ?? ""),
+      title: Text(expense?.name ?? ""),
       subtitle:
-      Text("\t${job?.startDate ?? "Empty"} \n"
-          "\t${job?.projectedEndDate ?? "Empty"}"),
+      Text("\t${expense?.description ?? "Empty"} \n"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }

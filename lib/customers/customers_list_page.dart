@@ -1,25 +1,23 @@
-import 'package:applying_pressure/jobs/add_job_page.dart';
-import 'package:applying_pressure/jobs/job_info_page.dart';
-import 'package:applying_pressure/widgets/app_bar.dart';
+import 'package:applying_pressure/customers/customer.dart';
+import 'package:applying_pressure/customers/customer_info_page.dart';
 import 'package:flutter/material.dart';
 
 import '../database_service.dart';
-import 'job.dart';
+import 'add_customer_page.dart';
 
-class JobsListPage extends StatefulWidget {
-  const JobsListPage({Key? key}) : super(key: key);
-  final String title = "Jobs";
-
-  static const routeName = '/jobsListPage';
+class CustomersListPage extends StatefulWidget {
+  const CustomersListPage({Key? key}) : super(key: key);
+  final String title = "Customers";
+  static const routeName = '/customersListPage';
 
   @override
-  State<JobsListPage> createState() => _JobsListPageState();
+  State<CustomersListPage> createState() => _CustomersListPageState();
 }
 
-class _JobsListPageState extends State<JobsListPage> {
+class _CustomersListPageState extends State<CustomersListPage> {
   DatabaseService service = DatabaseService();
-  Future<List<Job>>? jobList;
-  List<Job> retrievedJobList = [];
+  Future<List<Customer>>? customerList;
+  List<Customer> retrievedCustomerList = [];
 
   @override
   void initState() {
@@ -28,30 +26,33 @@ class _JobsListPageState extends State<JobsListPage> {
   }
 
   Future<void> _initRetrieval() async {
-    jobList = service.retrieveJobs();
-    retrievedJobList = await service.retrieveJobs();
+    customerList = service.retrieveCustomers();
+    retrievedCustomerList = await service.retrieveCustomers();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const APAppBar(title: 'Jobs'),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       body: RefreshIndicator(
         onRefresh: _initRetrieval,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: FutureBuilder(
-            future: jobList,
-            builder: (BuildContext context, AsyncSnapshot<List<Job>> snapshot) {
+            future: customerList,
+            builder: (BuildContext context, AsyncSnapshot<List<Customer>> snapshot) {
               if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 return ListView.separated(
-                    itemCount: retrievedJobList.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 10),
+                    itemCount: retrievedCustomerList.length,
+                    separatorBuilder: (context, index) =>
+                    const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      return createDismisable(retrievedJobList[index]);
+                      return createDismisable(retrievedCustomerList[index]);
                     });
               } else if (snapshot.connectionState == ConnectionState.done
-                  && retrievedJobList.isEmpty) {
+                  && retrievedCustomerList.isEmpty) {
                 return createEmptyState();
               } else {
                 return const Center(child: CircularProgressIndicator());
@@ -62,7 +63,7 @@ class _JobsListPageState extends State<JobsListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.pushNamed(context, AddJobPage.routeName);
+          Navigator.pushNamed(context, AddCustomerPage.routeName);
         }),
         tooltip: 'add',
         child: const Icon(Icons.add),
@@ -82,11 +83,11 @@ class _JobsListPageState extends State<JobsListPage> {
     );
   }
 
-  Widget createDismisable(Job? job) {
+  Widget createDismisable(Customer? customer) {
     return Dismissible(
         onDismissed: ((direction) async {
-          await service.deleteJob(
-              job?.id.toString() ?? "");
+          await service.deleteCustomer(
+              customer?.id.toString() ?? "");
         }),
         background: Container(
           decoration: BoxDecoration(
@@ -102,22 +103,22 @@ class _JobsListPageState extends State<JobsListPage> {
         direction: DismissDirection.endToStart,
         resizeDuration: const Duration(milliseconds: 200),
         key: UniqueKey(),
-        child: makeListTile(job)
+        child: makeListTile(customer)
     );
   }
 
-  Widget makeListTile(Job? job) {
+  Widget makeListTile(Customer? customer) {
     return ListTile(
       onTap: () {
-        Navigator.pushNamed(context, JobInfoPage.routeName, arguments: job);
+        Navigator.pushNamed(context, CustomerInfoPage.routeName, arguments: customer);
       },
       shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
-      title: Text(job?.title ?? ""),
+      title: Text(customer?.name ?? ""),
       subtitle:
-      Text("\t${job?.startDate ?? "Empty"} \n"
-          "\t${job?.projectedEndDate ?? "Empty"}"),
+      Text("\t${customer?.address ?? "Empty"} \n"
+          "\t${customer?.sourceOfLead ?? "Empty"}"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }

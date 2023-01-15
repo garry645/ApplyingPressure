@@ -16,7 +16,13 @@ class JobInfoPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Text(job.title),
+        child: Text('${job.title}\n\n'
+            'Start Date: '
+            '${job.startDate?.month}/${job.startDate?.day}/${job.startDate?.year} '
+            '${job.startDate?.hour}:${job.startDate?.minute}\n\n'
+            'Projected End Date: '
+            '${job.projectedEndDate?.month}/${job.projectedEndDate?.day}/${job.projectedEndDate?.year} '
+            '${job.projectedEndDate?.hour}:${job.projectedEndDate?.minute}\n\n'),
       ),
     );
   }

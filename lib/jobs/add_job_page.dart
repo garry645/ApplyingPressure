@@ -5,6 +5,7 @@ import 'job.dart';
 
 class AddJobPage extends StatefulWidget {
   const AddJobPage({super.key});
+
   static const routeName = '/addJobPage';
 
   @override
@@ -13,9 +14,10 @@ class AddJobPage extends StatefulWidget {
 
 class _AddJobPageState extends State<AddJobPage> {
   TextEditingController titleController = TextEditingController();
-  TextEditingController startDateController = TextEditingController();
-  TextEditingController projectedEndDateController = TextEditingController();
-  TextEditingController actualEndDateController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+
+  DateTime startDate = DateTime.now();
+  DateTime projectedEndDate = DateTime.now();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -54,24 +56,70 @@ class _AddJobPageState extends State<AddJobPage> {
                           const Text('Title'),
                           const SizedBox(height: 8.0),
                           _createTextFormField("Title", titleController),
-                          const Text('Start Date'),
+                          const Text('Address'),
                           const SizedBox(height: 8.0),
-                          _createTextFormField(
-                              "Start Date", startDateController),
-                          const Text('Projected End Date'),
+                          _createTextFormField("Address", addressController),
+                          Text('Start Date & Time: '
+                              '${startDate.month}/${startDate.day}/${startDate.year}\t'
+                              '${startDate.hour}:${startDate.minute}',
+                              style: const TextStyle(fontSize: 18.0)),
+                          const SizedBox(height: 4.0),
+                          ElevatedButton(
+                              onPressed: pickStartDateTime,
+                              child: const Text("Select Date & Time")),
+                          Text('Projected End Date & Time: '
+                              '${startDate.month}/${startDate.day}/${startDate.year}\t'
+                              '${startDate.hour}:${startDate.minute}',
+                              style: const TextStyle(fontSize: 18.0)),
+                          const SizedBox(height: 4.0),
+                          ElevatedButton(
+                              onPressed: pickDateTime,
+                              child: const Text("Select Date & Time")),
                           const SizedBox(height: 8.0),
-                          _createTextFormField(
-                              "Projected End Date", projectedEndDateController),
-                          const Text('Actual End Date'),
-                          const SizedBox(height: 8.0),
-                          _createTextFormField(
-                              "Actual End Date", actualEndDateController),
                           !isLoading
                               ? _createSubmitButton()
                               : const Center(
                                   child: CircularProgressIndicator()),
                         ])))));
   }
+
+  Future<DateTime> pickDateTime() async {
+    DateTime? date = await pickDate();
+    if (date == null) return DateTime.now();
+
+    TimeOfDay? time = await pickTime();
+    if (time == null) return DateTime.now();
+
+    final dateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute
+    );
+
+    return dateTime;
+  }
+
+  Future pickStartDateTime() async {
+    DateTime startDateTime = await pickDateTime();
+    setState(() => startDate = startDateTime);
+  }
+
+  Future pickEndDateTime() async {
+    DateTime projectedEndDate = await pickDateTime();
+    setState(() => startDate = projectedEndDate);
+  }
+
+  Future<DateTime?> pickDate() => showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(3000));
+
+  Future<TimeOfDay?> pickTime() => showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 12, minute: 00));
 
   Widget _createTextFormField(String field, TextEditingController controller) {
     return Container(
@@ -103,23 +151,20 @@ class _AddJobPageState extends State<AddJobPage> {
                   DatabaseService service = DatabaseService();
                   Job job = Job(
                     title: titleController.text,
-                    startDate: startDateController.text,
-                    projectedEndDate: projectedEndDateController.text,
-                    actualEndDate: actualEndDateController.text);
+                    address: addressController.text,
+                    startDate: startDate,
+                    projectedEndDate: projectedEndDate);
 
-                  setState(() {
-                    isLoading = true;
-                  });
-                  await service.addJob(job);
-                  setState(() {
-                    isLoading = false;
-                  });
-                }
-              }),
-              child: const Text("Submit", style: TextStyle(fontSize: 20))
-          ),
+              setState(() {
+                isLoading = true;
+              });
+              await service.addJob(job);
+              setState(() {
+                isLoading = false;
+              });
+            }
+          }),
+          child: const Text("Submit", style: TextStyle(fontSize: 20))),
     ));
-    /*:
-    )*/
   }
 }
