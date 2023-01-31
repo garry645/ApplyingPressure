@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -49,6 +43,16 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyC4aLvwOXoSzblHgq2azgFd1b840p1IuY0',
+    appId: '1:65700282049:web:053ee5b689f73bc5915e40',
+    messagingSenderId: '65700282049',
+    projectId: 'applyingpressure-a0205',
+    authDomain: 'applyingpressure-a0205.firebaseapp.com',
+    storageBucket: 'applyingpressure-a0205.appspot.com',
+    measurementId: 'G-FS1LQ5NQDP',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBN3C-Y7z7v_xJfTp8CVwxuQvTjtYYbtq8',
     appId: '1:65700282049:android:43744ac8d4df454a915e40',
@@ -58,6 +62,16 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBpqf1y4FMVb91PLOo0UiHUTa6v528JREc',
+    appId: '1:65700282049:ios:83466a551aff7bd0915e40',
+    messagingSenderId: '65700282049',
+    projectId: 'applyingpressure-a0205',
+    storageBucket: 'applyingpressure-a0205.appspot.com',
+    iosClientId: '65700282049-5h5kl8gvem22r7utk6tirhlf0qt107kf.apps.googleusercontent.com',
+    iosBundleId: 'com.garrytech.applyingPressure',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBpqf1y4FMVb91PLOo0UiHUTa6v528JREc',
     appId: '1:65700282049:ios:83466a551aff7bd0915e40',
     messagingSenderId: '65700282049',

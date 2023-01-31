@@ -26,11 +26,12 @@ class Customer {
     };
   }
 
-  Customer.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
-      : id = doc.id,
-        name = doc['name'],
-        address = doc["address"],
-        phoneNumber = doc["phoneNumber"],
-        sourceOfLead = doc["sourceOfLead"],
-        potentialCustomers = doc["potentialCustomers"];
+  Customer.fromDocumentSnapshot(DocumentSnapshot doc) 
+    : id = doc.id,
+      name = (doc.data() as dynamic)['name'] ?? "",
+      address = (doc.data() as dynamic)["address"] ?? "",
+      sourceOfLead = (doc.data() as dynamic)["sourceOfLead"] ?? "",
+      phoneNumber = (doc.data() as dynamic)["phoneNumber"] ?? "",
+      potentialCustomers = (doc.data() as dynamic)["potentialCustomers"] ?? [];
+
 }

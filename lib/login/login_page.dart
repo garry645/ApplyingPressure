@@ -92,9 +92,11 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     isLoading = true;
                   });
+
                   await Auth().signInWithEmailAndPassword(
                       email: emailController.text,
                       password: passwordController.text);
+
                   setState(() {
                     isLoading = false;
                   });

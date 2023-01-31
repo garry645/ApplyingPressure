@@ -14,51 +14,64 @@ const String expensesCollection = "Expenses";
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  String currJobCollection = true ? testJobsCollection : jobsCollection;
+  String currCustomerCollection = true ? testCustomersCollection : customersCollection;
+  String currExpenseCollection = true ? testExpensesCollection : expensesCollection;
 
   addJob(Job jobData) async {
-    await _db.collection(jobsCollection).add(jobData.toMap());
+    await _db.collection(currJobCollection).withConverter(
+      fromFirestore: Job.fromFirestore,
+      toFirestore: (Job job, _) => job.toFirestore(),
+    ).add(jobData);
   }
 
-  updateJob(Job jobData) async {
-    await _db.collection(jobsCollection).doc(jobData.id).update(jobData.toMap());
+  updateJob(String id, Job newJobData) async {
+    await _db.collection(currJobCollection).doc(id).update(newJobData.toMap());
   }
 
   Future<void> deleteJob(String documentId) async {
-    await _db.collection(jobsCollection).doc(documentId).delete();
-
+    await _db.collection(currJobCollection).doc(documentId).delete();
   }
 
   Future<List<Job>> retrieveJobsByTitle(String title) async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(jobsCollection).where("title", isEqualTo: title).get();
+    await _db.collection(currJobCollection).where("title", isEqualTo: title).get();
     return snapshot.docs
         .map((docSnapshot) => Job.fromDocumentSnapshot(docSnapshot))
         .toList();
   }
 
+  Future<Job> retrieveJobById(String id) async {
+    var snap = await _db.collection(currJobCollection).doc(id).withConverter(
+      fromFirestore: Job.fromFirestore,
+      toFirestore: (Job job, _) => job.toFirestore(),
+    ).get();
+    return snap.data() ?? Job(title: "Error", address: "Error");
+  }
+
   Future<List<Job>> retrieveJobs() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(jobsCollection).get();
+    await _db.collection(currJobCollection).get();
     return snapshot.docs
         .map((docSnapshot) => Job.fromDocumentSnapshot(docSnapshot))
         .toList();
   }
 
   addCustomer(Customer customerData) async {
-    await _db.collection(customersCollection).add(customerData.toMap());
+    await _db.collection(currCustomerCollection).add(customerData.toMap());
   }
 
   updateCustomer(Customer customerData) async {
-    await _db.collection(customersCollection).doc(customerData.id).update(customerData.toMap());
+    await _db.collection(currCustomerCollection).doc(customerData.id).update(customerData.toMap());
   }
 
   Future<void> deleteCustomer(String documentId) async {
-    await _db.collection(customersCollection).doc(documentId).delete();
+    await _db.collection(currCustomerCollection).doc(documentId).delete();
   }
 
   Future<List<Customer>> retrieveCustomersByName(String name) async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(customersCollection).where("name", isEqualTo: name).get();
+    await _db.collection(currCustomerCollection).where("name", isEqualTo: name).get();
     return snapshot.docs
         .map((docSnapshot) => Customer.fromDocumentSnapshot(docSnapshot))
         .toList();
@@ -66,7 +79,7 @@ class DatabaseService {
 
   Future<List<Customer>> retrieveCustomersBySourceOfLead(String source) async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(customersCollection).where("sourceOfLead", isEqualTo: source).get();
+    await _db.collection(currCustomerCollection).where("sourceOfLead", isEqualTo: source).get();
     return snapshot.docs
         .map((docSnapshot) => Customer.fromDocumentSnapshot(docSnapshot))
         .toList();
@@ -74,28 +87,28 @@ class DatabaseService {
 
   Future<List<Customer>> retrieveCustomers() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(customersCollection).get();
+    await _db.collection(currCustomerCollection).get();
     return snapshot.docs
         .map((docSnapshot) => Customer.fromDocumentSnapshot(docSnapshot))
         .toList();
   }
 
   addExpense(Expense expenseData) async {
-    await _db.collection(expensesCollection).add(expenseData.toMap());
+    await _db.collection(currExpenseCollection).add(expenseData.toMap());
   }
 
   updateExpense(Expense expenseData) async {
-    await _db.collection(expensesCollection).doc(expenseData.id).update(expenseData.toMap());
+    await _db.collection(currExpenseCollection).doc(expenseData.id).update(expenseData.toMap());
   }
 
   Future<void> deleteExpense(String documentId) async {
-    await _db.collection(expensesCollection).doc(documentId).delete();
+    await _db.collection(currExpenseCollection).doc(documentId).delete();
 
   }
 
   Future<List<Expense>> retrieveExpensesByName(String name) async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(expensesCollection).where("name", isEqualTo: name).get();
+    await _db.collection(currExpenseCollection).where("name", isEqualTo: name).get();
     return snapshot.docs
         .map((docSnapshot) => Expense.fromDocumentSnapshot(docSnapshot))
         .toList();
@@ -103,7 +116,7 @@ class DatabaseService {
 
   Future<List<Expense>> retrieveExpensesBySourceOfLead(String source) async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(expensesCollection).where("sourceOfLead", isEqualTo: source).get();
+    await _db.collection(currExpenseCollection).where("sourceOfLead", isEqualTo: source).get();
     return snapshot.docs
         .map((docSnapshot) => Expense.fromDocumentSnapshot(docSnapshot))
         .toList();
@@ -111,7 +124,7 @@ class DatabaseService {
 
   Future<List<Expense>> retrieveExpenses() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(expensesCollection).get();
+    await _db.collection(currExpenseCollection).get();
     return snapshot.docs
         .map((docSnapshot) => Expense.fromDocumentSnapshot(docSnapshot))
         .toList();

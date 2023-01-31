@@ -22,7 +22,7 @@ class Expense {
 
   Expense.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
       : id = doc.id,
-        name = doc['name'],
-        cost = doc['cost'],
-        description = doc['description'];
+        name = (doc.data() as dynamic)['name'] ?? "N/A",
+        cost = (doc.data() as dynamic)['cost'] ?? 00.00,
+        description = (doc.data() as dynamic)['description'] ?? "N/A";
 }
