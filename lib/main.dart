@@ -31,6 +31,7 @@ class ApplyingPressureApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       initialRoute: WidgetTree.routeName,
+      debugShowCheckedModeBanner: false,
       routes: {
         WidgetTree.routeName: (context) => const WidgetTree(),
         LoginPage.routeName: (context) => const LoginPage(),
