@@ -82,11 +82,11 @@ class _JobsListPageState extends State<JobsListPage> {
     );
   }
 
-  Widget createDismisable(Job? job) {
+  Widget createDismisable(Job job) {
     return Dismissible(
         onDismissed: ((direction) async {
           await service.deleteJob(
-              job?.id.toString() ?? "");
+              job.id.toString());
         }),
         background: Container(
           decoration: BoxDecoration(
@@ -106,18 +106,18 @@ class _JobsListPageState extends State<JobsListPage> {
     );
   }
 
-  Widget makeListTile(Job? job) {
+  Widget makeListTile(Job job) {
     return ListTile(
       onTap: () {
-        Navigator.pushNamed(context, JobInfoPage.routeName, arguments: job);
+        Navigator.pushNamed(context, JobInfoPage.routeName, arguments: job.id);
       },
       shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
-      title: Text(job?.title ?? ""),
+      title: Text(job.title),
       subtitle:
-      Text("\t${job?.startDate ?? "Empty"} \n"
-          "\t${job?.projectedEndDate ?? "Empty"}"),
+      Text("\t${job.startDate ?? "Empty"} \n"
+          "\t${job.projectedEndDate ?? "Empty"}"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }
