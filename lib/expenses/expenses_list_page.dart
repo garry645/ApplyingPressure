@@ -117,7 +117,7 @@ class _ExpensesListPageState extends State<ExpensesListPage> {
           borderRadius: BorderRadius.circular(5)),
       title: Text(expense?.name ?? ""),
       subtitle:
-      Text("\t${expense?.description ?? "Empty"} \n"),
+      Text("${expense?.description ?? "Empty"} \n"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }

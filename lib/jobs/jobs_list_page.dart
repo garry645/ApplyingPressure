@@ -1,5 +1,6 @@
 import 'package:applying_pressure/jobs/add_job_page.dart';
 import 'package:applying_pressure/jobs/job_info_page.dart';
+import 'package:applying_pressure/strings.dart';
 import 'package:applying_pressure/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -116,8 +117,8 @@ class _JobsListPageState extends State<JobsListPage> {
           borderRadius: BorderRadius.circular(5)),
       title: Text(job.title),
       subtitle:
-      Text("\t${job.startDate ?? "Empty"} \n"
-          "\t${job.projectedEndDate ?? "Empty"}"),
+      Text("${job.startDate ?? naString} \n"
+          "${job.projectedEndDate ?? naString}"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }

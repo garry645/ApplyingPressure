@@ -1,5 +1,6 @@
 import 'package:applying_pressure/customers/customer.dart';
 import 'package:applying_pressure/customers/customer_info_page.dart';
+import 'package:applying_pressure/strings.dart';
 import 'package:flutter/material.dart';
 
 import '../database_service.dart';
@@ -83,11 +84,11 @@ class _CustomersListPageState extends State<CustomersListPage> {
     );
   }
 
-  Widget createDismisable(Customer? customer) {
+  Widget createDismisable(Customer customer) {
     return Dismissible(
         onDismissed: ((direction) async {
           await service.deleteCustomer(
-              customer?.id.toString() ?? "");
+              customer.id.toString());
         }),
         background: Container(
           decoration: BoxDecoration(
@@ -107,18 +108,18 @@ class _CustomersListPageState extends State<CustomersListPage> {
     );
   }
 
-  Widget makeListTile(Customer? customer) {
+  Widget makeListTile(Customer customer) {
     return ListTile(
       onTap: () {
-        Navigator.pushNamed(context, CustomerInfoPage.routeName, arguments: customer);
+        Navigator.pushNamed(context, CustomerInfoPage.routeName, arguments: customer.id);
       },
       shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
-      title: Text(customer?.name ?? ""),
+      title: Text(customer.name),
       subtitle:
-      Text("\t${customer?.address ?? "Empty"} \n"
-          "\t${customer?.sourceOfLead ?? "Empty"}"),
+      Text("${customer.address ?? naString} \n"
+          "${customer.phoneNumber ?? naString}"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }
