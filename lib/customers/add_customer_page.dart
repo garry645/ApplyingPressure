@@ -112,7 +112,9 @@ class _AddCustomerPageState extends State<AddCustomerPage> {
                       name: nameController.text,
                       address: addressController.text,
                       phoneNumber: phoneNumberController.text,
-                      sourceOfLead: sourceController.text);
+                      sourceOfLead: sourceController.text,
+                      potentialCustomers: List.empty()
+                  );
 
                   setState(() {
                     isLoading = true;

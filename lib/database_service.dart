@@ -1,3 +1,4 @@
+import 'package:applying_pressure/strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'customers/customer.dart';
@@ -14,9 +15,9 @@ const String expensesCollection = "Expenses";
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  String currJobCollection = true ? testJobsCollection : jobsCollection;
-  String currCustomerCollection = true ? testCustomersCollection : customersCollection;
-  String currExpenseCollection = true ? testExpensesCollection : expensesCollection;
+  String currJobCollection = false ? testJobsCollection : jobsCollection;
+  String currCustomerCollection = false ? testCustomersCollection : customersCollection;
+  String currExpenseCollection = false ? testExpensesCollection : expensesCollection;
 
   addJob(Job jobData) async {
     await _db.collection(currJobCollection).withConverter(
@@ -46,7 +47,7 @@ class DatabaseService {
       fromFirestore: Job.fromFirestore,
       toFirestore: (Job job, _) => job.toFirestore(),
     ).get();
-    return snap.data() ?? Job(title: "Error", address: "Error");
+    return snap.data() ?? Job(title: errorString, address: errorString);
   }
 
   Future<List<Job>> retrieveJobs() async {
@@ -69,6 +70,18 @@ class DatabaseService {
     await _db.collection(currCustomerCollection).doc(documentId).delete();
   }
 
+  Future<Customer> retrieveCustomerById(String id) async {
+    var snap = await _db.collection(currCustomerCollection).doc(id).withConverter(
+      fromFirestore: Customer.fromFirestore,
+      toFirestore: (Customer customer, _) => customer.toFirestore(),
+    ).get();
+    return snap.data() ?? Customer(
+        name: errorString,
+        address: errorString,
+        phoneNumber: errorString,
+        sourceOfLead: errorString,
+        potentialCustomers: List.empty());
+  }
   Future<List<Customer>> retrieveCustomersByName(String name) async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
     await _db.collection(currCustomerCollection).where("name", isEqualTo: name).get();
