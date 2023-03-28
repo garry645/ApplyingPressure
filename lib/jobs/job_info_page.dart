@@ -15,53 +15,58 @@ class JobInfoPage extends StatefulWidget {
 
 class _JobInfoPageState extends State<JobInfoPage> {
   DatabaseService service = DatabaseService();
-  Job job = Job(title: '', address: '');
   String jobId = "";
 
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      _initRetrieval();
-    });
-  }
-
-  Future<void> _initRetrieval() async {
+  Future<Job> _initRetrieval() async {
     jobId = ModalRoute.of(context)!.settings.arguments as String;
-    job = await service.retrieveJobById(jobId);
-    setState(() {});
+    return service.retrieveJobById(jobId);
   }
 
   @override
   Widget build(BuildContext context) {
     //final job = //ModalRoute.of(context)!.settings.arguments as Job;
     // Use the Job to create the UI.
+    return FutureBuilder<Job>(future: _initRetrieval(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return _jobInfoPage(Job(title: "Error", address: "Error"));
+          } else if (snapshot.hasData) {
+            Job job = snapshot.data!;
+            return _jobInfoPage(job);
+          } else {
+            return _jobInfoPage(Job(title: "Loading", address: "Loading"));
+          }
+        });
+  }
+
+  Widget _jobInfoPage(Job job) {
     return Scaffold(
       appBar: AppBar(),
       backgroundColor: Colors.grey[100],
       body: Center(
           child: Column(children: [
-        Container(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
-            alignment: Alignment.bottomCenter,
-            decoration: BoxDecoration(color: Colors.blue[600]),
-            child: Wrap(children: [
-              Column(
-                children: [
-                  Text('${job.title}\n\n', style: headerText()),
-                  Text('${job.status}\n\n', style: headerText()),
-                  Column(children: [
-                    Text('Start Date: ', style: subTitleText()),
-                    Text(getJobStartDateString(job), style: subTitleText()),
-                  ]),
-                  const SizedBox(width: 8),
-                  Column(children: [
-                    Text('Projected End Date: ', style: subTitleText()),
-                    Text(getJobEndDateString(job), style: subTitleText()),
-                  ])
-                ],
-              )
-            ])),
+            Container(
+                padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
+                alignment: Alignment.bottomCenter,
+                decoration: BoxDecoration(color: Colors.blue[600]),
+                child: Wrap(children: [
+                  Column(
+                    children: [
+                      Text('${job.title}\n\n', style: headerText()),
+                      Text('Status: ', style: subTitleText()),
+                      Text('${job.status}\n\n', style: headerText()),
+                      Column(children: [
+                        Text('Start Date: ', style: subTitleText()),
+                        Text(getJobStartDateString(job), style: subTitleText()),
+                      ]),
+                      const SizedBox(width: 8),
+                      Column(children: [
+                        Text('Projected End Date: ', style: subTitleText()),
+                        Text(getJobEndDateString(job), style: subTitleText()),
+                      ])
+                    ],
+                  )
+                ])),
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: const TextStyle(fontSize: 20),
@@ -73,7 +78,7 @@ class _JobInfoPageState extends State<JobInfoPage> {
               },
               child: const Text('Finish Job'),
             )
-      ])),
+          ])),
     );
   }
 

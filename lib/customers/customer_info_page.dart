@@ -20,11 +20,11 @@ class CustomerInfoPage extends StatefulWidget {
 class _CustomerInfoPageState extends State<CustomerInfoPage> {
   DatabaseService service = DatabaseService();
   Customer customer = Customer(
-    id: loadingString,
-    name: loadingString,
-    address: loadingString,
-    sourceOfLead: loadingString,
-    phoneNumber: loadingString,
+    id: "",
+    name: "",
+    address: "",
+    sourceOfLead: "",
+    phoneNumber: "",
     potentialCustomers: List.empty());
   String customerId = "";
 

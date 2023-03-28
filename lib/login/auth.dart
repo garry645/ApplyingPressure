@@ -24,7 +24,7 @@ class Auth {
       );
       return true;
     } on FirebaseAuthException catch (e) {
-      return false;
+      return Future.error(e);
     }
   }
 

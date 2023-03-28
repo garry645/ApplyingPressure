@@ -1,4 +1,5 @@
 import 'package:applying_pressure/login/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,6 +18,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   bool isLoading = false;
+  bool isError = false;
+  String loginErrorString = "";
 
   final textStyle = const TextStyle(
     color: Colors.white,
@@ -47,17 +50,17 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Email'),
-                          const SizedBox(height: 8.0),
+                          _createHintField("Email"),
                           _createTextFormField("Email", emailController),
-                          const Text('Password'),
-                          const SizedBox(height: 8.0),
+                          _createHintField("Password"),
                           _createTextFormField("Password", passwordController),
-                          !isLoading
-                              ? _createSubmitButton()
-                              : const Center(
-                              child: CircularProgressIndicator()),
+                          _createSubmitButton(),
+                          _createErrorHint()
                         ])))));
+  }
+
+  Widget _createHintField(String hint) {
+    return Column(children: const [Text('Email'), SizedBox(height: 8.0)]);
   }
 
   Widget _createTextFormField(String field, TextEditingController controller) {
@@ -77,33 +80,55 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
+  Future<bool> _signInWithEmailAndPassword(String email, String password) {
+    return Auth().signInWithEmailAndPassword(
+        email: emailController.text, password: passwordController.text);
+  }
+
   Widget _createSubmitButton() {
-    return Center(
-        child: Container(
-          margin: const EdgeInsets.only(top: 10.0),
-          child: ElevatedButton(
-              style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(const Size(200, 50)),
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      const Color.fromARGB(255, 83, 80, 80))),
-              onPressed: (() async {
-                if (_formKey.currentState!.validate()) {
+    return !isLoading
+        ? Center(
+            child: Container(
+            margin: const EdgeInsets.only(top: 10.0),
+            child: ElevatedButton(
+                style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(const Size(200, 50)),
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color.fromARGB(255, 83, 80, 80))),
+                onPressed: (() {
+                  if (_formKey.currentState!.validate()) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    _signInWithEmailAndPassword(
+                            emailController.text, passwordController.text)
+                        .then((value) => {
+                              setState(() {
+                                isLoading = false;
+                              })
+                            })
+                        .onError((error, stackTrace) => {
+                           handleError(error as FirebaseAuthException)
+                    });
+                  }
+                }),
+                child: const Text("Submit", style: TextStyle(fontSize: 20))),
+          ))
+        : const Center(child: CircularProgressIndicator());
+  }
 
-                  setState(() {
-                    isLoading = true;
-                  });
+  void handleError(FirebaseAuthException e) {
+    setState(() {
+      loginErrorString = e.message ?? "Error logging in";
+      isError = true;
+      isLoading = false;
+    });
 
-                  await Auth().signInWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text);
+  }
 
-                  setState(() {
-                    isLoading = false;
-                  });
-                }
-
-              }),
-              child: const Text("Submit", style: TextStyle(fontSize: 20))),
-        ));
+  Widget _createErrorHint() {
+    return Center(child: Container(
+        margin: const EdgeInsets.only(top: 10.0),
+        child: Text(isError ? loginErrorString : "")));
   }
 }

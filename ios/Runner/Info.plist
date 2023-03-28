@@ -35,6 +35,10 @@
 	<key>UIStatusBarStyle</key>
 	<string></string>
 	<key>UISupportedInterfaceOrientations</key>
+	<key>NSCameraUsageDescription</key>
+    <string>Needed to take pictures</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Needed for videos</string>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>

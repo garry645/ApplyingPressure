@@ -1,3 +1,5 @@
+import 'package:applying_pressure/camera/display_picture_screen.dart';
+import 'package:applying_pressure/camera/take_picture_screen.dart';
 import 'package:applying_pressure/customers/customer_info_page.dart';
 import 'package:applying_pressure/customers/customers_list_page.dart';
 import 'package:applying_pressure/expenses/add_expense_page.dart';
@@ -47,7 +49,9 @@ class ApplyingPressureApp extends StatelessWidget {
         CustomerInfoPage.routeName: (context) => const CustomerInfoPage(),
         ExpensesListPage.routeName: (context) => const ExpensesListPage(),
         AddExpensePage.routeName: (context) => const AddExpensePage(),
-        ExpenseInfoPage.routeName: (context) => const ExpenseInfoPage()
+        ExpenseInfoPage.routeName: (context) => const ExpenseInfoPage(),
+        TakePictureScreen.routeName: (context) => const TakePictureScreen()
+
       },
     );
   }
