@@ -111,7 +111,10 @@ class _CustomersListPageState extends State<CustomersListPage> {
   Widget makeListTile(Customer customer) {
     return ListTile(
       onTap: () {
-        Navigator.pushNamed(context, CustomerInfoPage.routeName, arguments: customer.id);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CustomerInfoPage(customer: customer)));
       },
       shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 1),

@@ -4,13 +4,15 @@ import 'package:applying_pressure/expenses/expense.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseInfoPage extends StatelessWidget {
+  final Expense expense;
+
   // In the constructor, require a Expense.
-  const ExpenseInfoPage({super.key});
+  const ExpenseInfoPage({super.key, required this.expense});
   static const routeName = '/expenseInfoPage';
 
   @override
   Widget build(BuildContext context) {
-    final expense = ModalRoute.of(context)!.settings.arguments as Expense;
+    //final expense = ModalRoute.of(context)!.settings.arguments as Expense;
     // Use the Expense to create the UI.
     return Scaffold(
       appBar: AppBar(),

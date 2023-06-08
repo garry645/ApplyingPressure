@@ -49,7 +49,11 @@ class _HomePageState extends State<HomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      if (!loggedIn) Navigator.pushNamed(context, LoginPage.routeName);
+      if (!loggedIn) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()));
+      }
       _selectedIndex = index;
     });
   }

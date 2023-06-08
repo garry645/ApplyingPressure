@@ -7,8 +7,9 @@ import '../strings.dart';
 const String loadingString = "Loading";
 
 class CustomerInfoPage extends StatefulWidget {
+  final Customer customer;
   // In the constructor, require a Customer.
-  const CustomerInfoPage({super.key});
+  const CustomerInfoPage({super.key, required this.customer});
 
   static const routeName = '/customerInfoPage';
 

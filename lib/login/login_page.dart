@@ -97,11 +97,10 @@ class _LoginPageState extends State<LoginPage> {
                         const Color.fromARGB(255, 83, 80, 80))),
                 onPressed: (() {
                   if (_formKey.currentState!.validate()) {
-                    setState(() {
-                      isLoading = true;
-                    });
+                    setState(() { isLoading = true; });
                     _signInWithEmailAndPassword(
-                            emailController.text, passwordController.text)
+                        emailController.text,
+                        passwordController.text)
                         .then((value) => {
                               setState(() {
                                 isLoading = false;

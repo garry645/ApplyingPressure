@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../customers/customer.dart';
+
 class Job {
   final String? id;
   final String title;
@@ -10,6 +11,7 @@ class Job {
   final DateTime? projectedEndDate;
   DateTime? actualEndDate;
   Customer? customer;
+  String? receiptImageUrl;
 
   Job(
       {this.id,
@@ -19,7 +21,8 @@ class Job {
       this.startDate,
       this.projectedEndDate,
       this.actualEndDate,
-      this.customer});
+      this.customer,
+      this.receiptImageUrl});
 
   factory Job.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -34,7 +37,8 @@ class Job {
         startDate: (data?['startDate'] as Timestamp).toDate(),
         projectedEndDate: (data?['projectedEndDate'] as Timestamp).toDate(),
         actualEndDate: (data?['projectedEndDate'] as Timestamp).toDate(),
-        customer: data?['customer']);
+        customer: data?['customer'],
+        receiptImageUrl: data?['receiptImageUrl']);
   }
 
   Map<String, dynamic> toFirestore() {
@@ -47,6 +51,7 @@ class Job {
       if (projectedEndDate != null) "projectedEndDate": projectedEndDate,
       if (actualEndDate != null) "actualEndDate": actualEndDate,
       if (customer != null) "customer": customer,
+      if(receiptImageUrl != null) "receiptImageUrl": receiptImageUrl
     };
   }
 
@@ -59,6 +64,16 @@ class Job {
       'projectedEndDate': projectedEndDate,
       'actualEndDate': actualEndDate,
     };
+  }
+
+  factory Job.fromJson(Map<String, dynamic>? json) {
+    return Job(
+      title: json?['title'] ?? '',
+      address: json?['address'] ?? '',
+      startDate: json?['startDate']?.toDate() ?? DateTime.now(),
+      projectedEndDate: json?['projectedEndDate']?.toDate() ?? DateTime.now(),
+      actualEndDate: json?['actualEndDate']?.toDate() ?? DateTime.now(),
+    );
   }
 
   Job.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)

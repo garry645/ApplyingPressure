@@ -49,7 +49,8 @@ class _ExpensesListPageState extends State<ExpensesListPage> {
                     separatorBuilder: (context, index) =>
                     const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      return createDismisable(retrievedExpenseList[index]);
+                      Expense expense = retrievedExpenseList[index];
+                      return createDismisable(expense);
                     });
               } else if (snapshot.connectionState == ConnectionState.done
                   && retrievedExpenseList.isEmpty) {
@@ -83,11 +84,11 @@ class _ExpensesListPageState extends State<ExpensesListPage> {
     );
   }
 
-  Widget createDismisable(Expense? expense) {
+  Widget createDismisable(Expense expense) {
     return Dismissible(
         onDismissed: ((direction) async {
           await service.deleteExpense(
-              expense?.id.toString() ?? "");
+              expense.id.toString() ?? "");
         }),
         background: Container(
           decoration: BoxDecoration(
@@ -107,17 +108,21 @@ class _ExpensesListPageState extends State<ExpensesListPage> {
     );
   }
 
-  Widget makeListTile(Expense? expense) {
+  Widget makeListTile(Expense expenseIn) {
     return ListTile(
       onTap: () {
-        Navigator.pushNamed(context, ExpenseInfoPage.routeName, arguments: expense);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ExpenseInfoPage(expense: expenseIn)));
+        //Navigator.pushNamed(context, ExpenseInfoPage.routeName, arguments: expense);
       },
       shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
-      title: Text(expense?.name ?? ""),
+      title: Text(expenseIn.name ?? ""),
       subtitle:
-      Text("${expense?.description ?? "Empty"} \n"),
+      Text("${expenseIn.description ?? "Empty"} \n"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }

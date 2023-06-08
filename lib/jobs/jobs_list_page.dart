@@ -2,14 +2,16 @@ import 'package:applying_pressure/jobs/add_job_page.dart';
 import 'package:applying_pressure/jobs/job_info_page.dart';
 import 'package:applying_pressure/strings.dart';
 import 'package:applying_pressure/widgets/app_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../database_service.dart';
 import 'job.dart';
 
 class JobsListPage extends StatefulWidget {
-  const JobsListPage({Key? key}) : super(key: key);
   final String title = "Jobs";
+
+  const JobsListPage({Key? key}) : super(key: key);
 
   static const routeName = '/jobsListPage';
 
@@ -19,51 +21,44 @@ class JobsListPage extends StatefulWidget {
 
 class _JobsListPageState extends State<JobsListPage> {
   DatabaseService service = DatabaseService();
-  Future<List<Job>>? jobList;
-  List<Job> retrievedJobList = [];
+  late Stream<QuerySnapshot<Map<String, dynamic>>> jobStream;
 
   @override
   void initState() {
     super.initState();
-    _initRetrieval();
-  }
 
-  Future<void> _initRetrieval() async {
-    jobList = service.retrieveJobs();
-    retrievedJobList = await service.retrieveJobs();
+    jobStream = service.retrieveJobs();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const APAppBar(title: 'Jobs'),
-      body: RefreshIndicator(
-        onRefresh: _initRetrieval,
-        child: Padding(
+      body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder(
-            future: jobList,
-            builder: (BuildContext context, AsyncSnapshot<List<Job>> snapshot) {
-              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                return ListView.separated(
-                    itemCount: retrievedJobList.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      return createDismisable(retrievedJobList[index]);
-                    });
-              } else if (snapshot.connectionState == ConnectionState.done
-                  && retrievedJobList.isEmpty) {
-                return createEmptyState();
-              } else {
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: jobStream,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
+
+              List<DocumentSnapshot<Map<String, dynamic>>> jobs =
+                  snapshot.data?.docs ?? [];
+
+              return ListView.separated(
+                  itemCount: jobs.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    return createDismisable(jobs[index]);
+                  });
             },
-          ),
-        ),
-      ),
+          )),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.pushNamed(context, AddJobPage.routeName);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AddJobPage()));
         }),
         tooltip: 'add',
         child: const Icon(Icons.add),
@@ -83,41 +78,49 @@ class _JobsListPageState extends State<JobsListPage> {
     );
   }
 
-  Widget createDismisable(Job job) {
-    return Dismissible(
-        onDismissed: ((direction) async {
-          await service.deleteJob(
-              job.id.toString());
-        }),
-        background: Container(
-          decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(5)),
-          padding: const EdgeInsets.only(right: 28.0),
-          alignment: AlignmentDirectional.centerEnd,
-          child: const Text(
-            "DELETE",
-            style: TextStyle(color: Colors.white),
+  Widget createDismisable(DocumentSnapshot<Map<String, dynamic>>? jobDoc) {
+    if (jobDoc != null) {
+      Job job = Job.fromJson(jobDoc.data());
+      return Dismissible(
+          onDismissed: ((direction) async {
+            await service.deleteJob(job.id.toString());
+          }),
+          background: Container(
+            decoration: BoxDecoration(
+                color: Colors.red, borderRadius: BorderRadius.circular(5)),
+            padding: const EdgeInsets.only(right: 28.0),
+            alignment: AlignmentDirectional.centerEnd,
+            child: const Text(
+              "DELETE",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
-        ),
-        direction: DismissDirection.endToStart,
-        resizeDuration: const Duration(milliseconds: 200),
-        key: UniqueKey(),
-        child: makeListTile(job)
-    );
+          direction: DismissDirection.endToStart,
+          resizeDuration: const Duration(milliseconds: 200),
+          key: UniqueKey(),
+          child: makeListTile(jobDoc));
+    } else {
+      return const SizedBox.shrink();
+    }
   }
 
-  Widget makeListTile(Job job) {
+  Widget makeListTile(DocumentSnapshot<Map<String, dynamic>> jobDoc) {
+    Job job = Job.fromJson(jobDoc.data());
     return ListTile(
       onTap: () {
-        Navigator.pushNamed(context, JobInfoPage.routeName, arguments: job.id);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => JobInfoPage(
+                      jobDoc: jobDoc,
+                    )));
+        //Navigator.pushNamed(context, JobInfoPage.routeName, arguments: job.id);
       },
       shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
       title: Text(job.title),
-      subtitle:
-      Text("${job.startDate ?? naString} \n"
+      subtitle: Text("${job.startDate ?? naString} \n"
           "${job.projectedEndDate ?? naString}"),
       trailing: const Icon(Icons.arrow_right_sharp),
     );

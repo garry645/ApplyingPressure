@@ -50,12 +50,8 @@ class DatabaseService {
     return snap.data() ?? Job(title: errorString, address: errorString);
   }
 
-  Future<List<Job>> retrieveJobs() async {
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-    await _db.collection(currJobCollection).get();
-    return snapshot.docs
-        .map((docSnapshot) => Job.fromDocumentSnapshot(docSnapshot))
-        .toList();
+  Stream<QuerySnapshot<Map<String, dynamic>>> retrieveJobs() {
+    return _db.collection(currJobCollection).snapshots();
   }
 
   addCustomer(Customer customerData) async {
