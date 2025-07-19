@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../customers/customers_list_page.dart';
 import '../expenses/expenses_list_page.dart';
 import '../jobs/jobs_list_page.dart';
-import '../login/auth.dart';
+import '../services/service_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,21 +15,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static const List<Widget> _pages = <Widget>[
-    JobsListPage(),
-    CustomersListPage(),
-    ExpensesListPage()
-  ];
-
   int _selectedIndex = 0;
   bool loggedIn = true;
-  final User? user = Auth().currentUser;
+  late User? user;
+  late final PageController _pageController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final authService = ServiceProvider.getAuthService(context);
+    user = authService.currentUser;
+  }
+  
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     if (loggedIn) {
       return Scaffold(
-        body: Center(child: _pages.elementAt(_selectedIndex)),
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          children: const [
+            JobsListPage(),
+            CustomersListPage(),
+            ExpensesListPage()
+          ],
+        ),
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Jobs"),
@@ -55,6 +81,11 @@ class _HomePageState extends State<HomePage> {
           MaterialPageRoute(builder: (context) => const LoginPage()));
       }
       _selectedIndex = index;
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     });
   }
 }

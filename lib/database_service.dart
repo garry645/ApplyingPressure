@@ -15,12 +15,19 @@ const String customersCollection = "Customers";
 const String expensesCollection = "Expenses";
 
 class DatabaseService {
+  static DatabaseService? _instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   late final String currJobCollection;
   late final String currCustomerCollection;
   late final String currExpenseCollection;
   
-  DatabaseService() {
+  // Singleton pattern
+  factory DatabaseService() {
+    _instance ??= DatabaseService._internal();
+    return _instance!;
+  }
+  
+  DatabaseService._internal() {
     final bool useTestCollections = dotenv.env['USE_TEST_COLLECTIONS'] == 'true';
     currJobCollection = useTestCollections ? testJobsCollection : jobsCollection;
     currCustomerCollection = useTestCollections ? testCustomersCollection : customersCollection;

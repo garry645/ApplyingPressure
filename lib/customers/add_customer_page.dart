@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../database_service.dart';
+import '../services/service_provider.dart';
+import '../services/interfaces/database_service_interface.dart';
 import 'customer.dart';
 
 class AddCustomerPage extends StatefulWidget {
@@ -116,7 +117,7 @@ class _AddCustomerPageState extends State<AddCustomerPage> {
                       const Color.fromARGB(255, 83, 80, 80))),
               onPressed: (() async {
                 if (_formKey.currentState!.validate()) {
-                  DatabaseService service = DatabaseService();
+                  DatabaseServiceInterface service = ServiceProvider.getDatabaseService(context);
                   Customer customer = Customer(
                       name: nameController.text,
                       address: addressController.text,

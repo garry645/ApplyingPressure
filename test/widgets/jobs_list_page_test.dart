@@ -3,17 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:applying_pressure/jobs/jobs_list_page.dart';
 import 'package:applying_pressure/jobs/job.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../firebase_test_config.dart';
+import '../test_helper.dart';
 
 void main() {
   setUpAll(() async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-      options: testFirebaseOptions,
-    );
-    dotenv.testLoad(fileInput: 'USE_TEST_COLLECTIONS=true\nENV=test');
+    await initializeTestEnvironment();
   });
 
   group('JobsListPage Date Formatting Tests', () {

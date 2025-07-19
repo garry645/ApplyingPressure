@@ -76,11 +76,15 @@ void main() {
 
   group('Date Comparison Tests', () {
     test('Dates with different milliseconds should be different', () {
-      final date1 = DateTime.now();
-      final date2 = DateTime.now();
+      final date1 = DateTime(2024, 1, 1, 12, 0, 0, 100); // 100 milliseconds
+      final date2 = DateTime(2024, 1, 1, 12, 0, 0, 200); // 200 milliseconds
       
-      // Even called immediately after, they should be different
+      // Different milliseconds should make dates unequal
       expect(date1, isNot(equals(date2)));
+      
+      // But when comparing just the time parts we care about, they're the same
+      expect(date1.hour, equals(date2.hour));
+      expect(date1.minute, equals(date2.minute));
     });
 
     test('Cleaned dates from same source should be equal', () {

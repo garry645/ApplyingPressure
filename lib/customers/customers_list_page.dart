@@ -3,7 +3,8 @@ import 'package:applying_pressure/customers/customer_info_page.dart';
 import 'package:applying_pressure/strings.dart';
 import 'package:flutter/material.dart';
 
-import '../database_service.dart';
+import '../services/service_provider.dart';
+import '../services/interfaces/database_service_interface.dart';
 import 'add_customer_page.dart';
 
 class CustomersListPage extends StatefulWidget {
@@ -16,19 +17,12 @@ class CustomersListPage extends StatefulWidget {
 }
 
 class _CustomersListPageState extends State<CustomersListPage> {
-  DatabaseService service = DatabaseService();
-  Future<List<Customer>>? customerList;
-  List<Customer> retrievedCustomerList = [];
+  late DatabaseServiceInterface service;
 
   @override
-  void initState() {
-    super.initState();
-    _initRetrieval();
-  }
-
-  Future<void> _initRetrieval() async {
-    customerList = service.retrieveCustomers();
-    retrievedCustomerList = await service.retrieveCustomers();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    service = ServiceProvider.getDatabaseService(context);
   }
 
   @override
@@ -38,26 +32,35 @@ class _CustomersListPageState extends State<CustomersListPage> {
         title: Text(widget.title),
       ),
       body: RefreshIndicator(
-        onRefresh: _initRetrieval,
+        onRefresh: () async {
+          // Stream will automatically update when data changes
+        },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder(
-            future: customerList,
+          child: StreamBuilder<List<Customer>>(
+            stream: service.retrieveCustomers(),
             builder: (BuildContext context, AsyncSnapshot<List<Customer>> snapshot) {
-              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                return ListView.separated(
-                    itemCount: retrievedCustomerList.length,
-                    separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      return createDismisable(retrievedCustomerList[index]);
-                    });
-              } else if (snapshot.connectionState == ConnectionState.done
-                  && retrievedCustomerList.isEmpty) {
-                return createEmptyState();
-              } else {
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
+              
+              final customers = snapshot.data ?? [];
+              
+              if (customers.isEmpty) {
+                return createEmptyState();
+              }
+              
+              return ListView.separated(
+                itemCount: customers.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  return createDismisable(customers[index]);
+                },
+              );
             },
           ),
         ),

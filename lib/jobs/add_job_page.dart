@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../database_service.dart';
+import '../services/service_provider.dart';
+import '../services/interfaces/database_service_interface.dart';
 import 'job.dart';
 
 class AddJobPage extends StatefulWidget {
@@ -169,7 +170,7 @@ class _AddJobPageState extends State<AddJobPage> {
                   const Color.fromARGB(255, 83, 80, 80))),
               onPressed: (() async {
                 if (_formKey.currentState!.validate()) {
-                  DatabaseService service = DatabaseService();
+                  final service = ServiceProvider.getDatabaseService(context);
                   Job job = Job(
                     title: titleController.text,
                     address: addressController.text,

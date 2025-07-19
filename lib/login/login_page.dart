@@ -1,6 +1,6 @@
-import 'package:applying_pressure/login/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../services/service_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -81,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> _signInWithEmailAndPassword(String email, String password) {
-    return Auth().signInWithEmailAndPassword(
+    final authService = ServiceProvider.getAuthService(context);
+    return authService.signInWithEmailAndPassword(
         email: emailController.text, password: passwordController.text);
   }
 

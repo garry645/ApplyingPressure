@@ -28,7 +28,7 @@ class Customer {
         address: data?['address'] ?? naString,
         sourceOfLead: data?['sourceOfLead'] ?? naString,
         phoneNumber: data?['phoneNumber'] ?? naString,
-        potentialCustomers: (data?['potentialCustomers'] as List<Customer>));
+        potentialCustomers: []);
   }
 
   Map<String, dynamic> toFirestore() {
@@ -38,7 +38,7 @@ class Customer {
       "address": address,
       "sourceOfLead": sourceOfLead,
       "phoneNumber": phoneNumber,
-      "potentialCustomers": potentialCustomers,
+      // "potentialCustomers": potentialCustomers, // Complex objects need special handling
     };
   }
 
@@ -48,7 +48,7 @@ class Customer {
       'address': address ?? naString,
       'phoneNumber': phoneNumber ?? naString,
       'sourceOfLead': sourceOfLead ?? naString,
-      'potentialCustomers': potentialCustomers,
+      // 'potentialCustomers': potentialCustomers, // Complex objects need special handling
     };
   }
 
@@ -58,6 +58,6 @@ class Customer {
       address = (doc.data() as dynamic)["address"] ?? naString,
       sourceOfLead = (doc.data() as dynamic)["sourceOfLead"] ?? naString,
       phoneNumber = (doc.data() as dynamic)["phoneNumber"] ?? naString,
-      potentialCustomers = (doc.data() as dynamic)["potentialCustomers"] ?? List.empty();
+      potentialCustomers = [];
 
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../database_service.dart';
+import '../services/service_provider.dart';
+import '../services/interfaces/database_service_interface.dart';
 import 'expense.dart';
 
 class AddExpensePage extends StatefulWidget {
@@ -124,7 +125,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       const Color.fromARGB(255, 83, 80, 80))),
               onPressed: (() async {
                 if (_formKey.currentState!.validate()) {
-                  DatabaseService service = DatabaseService();
+                  DatabaseServiceInterface service = ServiceProvider.getDatabaseService(context);
                   Expense expense = Expense(
                       name: nameController.text,
                       description: descriptionController.text,

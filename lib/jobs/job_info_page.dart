@@ -1,18 +1,17 @@
 import 'dart:io';
 
 import 'package:applying_pressure/jobs/job.dart';
-import 'package:camera/camera.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../database_service.dart';
+import '../services/service_provider.dart';
+import '../services/interfaces/database_service_interface.dart';
+import '../services/interfaces/storage_service_interface.dart';
 
 class JobInfoPage extends StatefulWidget {
-  final DocumentSnapshot<Map<String, dynamic>> jobDoc;
+  final Job job;
 
-  const JobInfoPage({super.key, required this.jobDoc});
+  const JobInfoPage({super.key, required this.job});
 
   static const routeName = '/jobInfoPage';
 
@@ -22,8 +21,8 @@ class JobInfoPage extends StatefulWidget {
 
 class _JobInfoPageState extends State<JobInfoPage> {
   final ImagePicker _picker = ImagePicker();
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  DatabaseService service = DatabaseService();
+  late DatabaseServiceInterface databaseService;
+  late StorageServiceInterface storageService;
   String? receiptImageUrl;
 
   //File image;
@@ -34,8 +33,15 @@ class _JobInfoPageState extends State<JobInfoPage> {
   }*/
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    databaseService = ServiceProvider.getDatabaseService(context);
+    storageService = ServiceProvider.getStorageService(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Job job = Job.fromJson(widget.jobDoc.data());
+    Job job = widget.job;
     // Use the Job to create the UI.
     return _jobInfoPage(job); /*FutureBuilder<Job>(future: _initRetrieval(),
         builder: (context, snapshot) {
@@ -106,16 +112,25 @@ class _JobInfoPageState extends State<JobInfoPage> {
               if (pickedFile != null) {
                 final file = File(pickedFile.path);
 
-                final ref = _storage.ref().child('images/${pickedFile.name}');
-                await ref.putFile(file);
+                // Upload the image using storage service
+                receiptImageUrl = await storageService.uploadFile(
+                  file: file,
+                  path: 'images',
+                  fileName: pickedFile.name,
+                );
 
-                // Get the download URL of the image
-                receiptImageUrl = await ref.getDownloadURL();
-
-                // Update the image URL in Firestore
-                await widget.jobDoc.reference.update({
-                  'receiptImageUrl': receiptImageUrl,
-                });
+                // Update the job with the new image URL
+                Job updatedJob = Job(
+                  id: job.id,
+                  title: job.title,
+                  address: job.address,
+                  startDate: job.startDate,
+                  projectedEndDate: job.projectedEndDate,
+                  actualEndDate: job.actualEndDate,
+                  customer: job.customer,
+                  receiptImageUrl: receiptImageUrl,
+                );
+                await databaseService.updateJob(job.id!, updatedJob);
               }
             },
             icon: const Icon(Icons.camera)),

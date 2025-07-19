@@ -2,7 +2,8 @@ import 'package:applying_pressure/expenses/expense.dart';
 import 'package:applying_pressure/expenses/expense_info_page.dart';
 import 'package:flutter/material.dart';
 
-import '../database_service.dart';
+import '../services/service_provider.dart';
+import '../services/interfaces/database_service_interface.dart';
 import 'add_expense_page.dart';
 
 class ExpensesListPage extends StatefulWidget {
@@ -15,19 +16,12 @@ class ExpensesListPage extends StatefulWidget {
 }
 
 class _ExpensesListPageState extends State<ExpensesListPage> {
-  DatabaseService service = DatabaseService();
-  Future<List<Expense>>? expenseList;
-  List<Expense> retrievedExpenseList = [];
+  late DatabaseServiceInterface service;
 
   @override
-  void initState() {
-    super.initState();
-    _initRetrieval();
-  }
-
-  Future<void> _initRetrieval() async {
-    expenseList = service.retrieveExpenses();
-    retrievedExpenseList = await service.retrieveExpenses();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    service = ServiceProvider.getDatabaseService(context);
   }
 
   @override
@@ -37,27 +31,35 @@ class _ExpensesListPageState extends State<ExpensesListPage> {
         title: Text(widget.title),
       ),
       body: RefreshIndicator(
-        onRefresh: _initRetrieval,
+        onRefresh: () async {
+          // Stream will automatically update when data changes
+        },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: FutureBuilder(
-            future: expenseList,
+          child: StreamBuilder<List<Expense>>(
+            stream: service.retrieveExpenses(),
             builder: (BuildContext context, AsyncSnapshot<List<Expense>> snapshot) {
-              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                return ListView.separated(
-                    itemCount: retrievedExpenseList.length,
-                    separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      Expense expense = retrievedExpenseList[index];
-                      return createDismisable(expense);
-                    });
-              } else if (snapshot.connectionState == ConnectionState.done
-                  && retrievedExpenseList.isEmpty) {
-                return createEmptyState();
-              } else {
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
+              
+              final expenses = snapshot.data ?? [];
+              
+              if (expenses.isEmpty) {
+                return createEmptyState();
+              }
+              
+              return ListView.separated(
+                itemCount: expenses.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  return createDismisable(expenses[index]);
+                },
+              );
             },
           ),
         ),
@@ -88,7 +90,7 @@ class _ExpensesListPageState extends State<ExpensesListPage> {
     return Dismissible(
         onDismissed: ((direction) async {
           await service.deleteExpense(
-              expense.id.toString() ?? "");
+              expense.id.toString());
         }),
         background: Container(
           decoration: BoxDecoration(

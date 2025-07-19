@@ -1,7 +1,6 @@
 import 'package:applying_pressure/customers/customer.dart';
 import 'package:flutter/material.dart';
 
-import '../database_service.dart';
 import '../strings.dart';
 
 const String loadingString = "Loading";
@@ -19,8 +18,6 @@ class CustomerInfoPage extends StatefulWidget {
 }
 
 class _CustomerInfoPageState extends State<CustomerInfoPage> {
-  DatabaseService service = DatabaseService();
-
   @override
   Widget build(BuildContext context) {
     //final customer = ModalRoute.of(context)!.settings.arguments as Customer;

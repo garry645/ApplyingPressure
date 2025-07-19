@@ -1,8 +1,17 @@
-import 'package:applying_pressure/widgets/widget_tree.dart';
+import 'widgets/widget_tree.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
+import 'services/service_provider.dart';
+import 'services/interfaces/auth_service_interface.dart';
+import 'services/interfaces/database_service_interface.dart';
+import 'services/interfaces/storage_service_interface.dart';
+import 'services/firebase/firebase_auth_service.dart';
+import 'services/firebase/firebase_database_service.dart';
+import 'services/firebase/firebase_storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,24 +19,57 @@ void main() async {
   // Load environment variables
   await dotenv.load(fileName: ".env");
   
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const ApplyingPressureApp());
+  
+  // Enable Firestore offline persistence (only for mobile/desktop, not web)
+  // Web persistence is handled differently and this might cause delays
+  if (!kIsWeb) {
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
+  }
+  
+  // Initialize services
+  final authService = FirebaseAuthService();
+  final databaseService = FirebaseDatabaseService();
+  final storageService = FirebaseStorageService();
+  
+  runApp(ApplyingPressureApp(
+    authService: authService,
+    databaseService: databaseService,
+    storageService: storageService,
+  ));
 }
 
 class ApplyingPressureApp extends StatelessWidget {
-  const ApplyingPressureApp({Key? key}) : super(key: key);
+  final AuthServiceInterface authService;
+  final DatabaseServiceInterface databaseService;
+  final StorageServiceInterface storageService;
 
-  // This widget is the root of your application.
+  const ApplyingPressureApp({
+    Key? key,
+    required this.authService,
+    required this.databaseService,
+    required this.storageService,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Applying Pressure',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ServiceProvider(
+      authService: authService,
+      databaseService: databaseService,
+      storageService: storageService,
+      child: MaterialApp(
+        title: 'Applying Pressure',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const WidgetTree(),
       ),
-      home: const WidgetTree()
     );
   }
 }

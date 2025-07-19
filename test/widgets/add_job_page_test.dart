@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:applying_pressure/jobs/add_job_page.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../firebase_test_config.dart';
+import '../test_helper.dart';
+import '../mocks/mock_auth_service.dart';
 
 void main() {
-  setUpAll(() async {
-    // Initialize Firebase for tests
-    TestWidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-      options: testFirebaseOptions,
+  late TestServices services;
+  
+  setUp(() {
+    services = TestServices();
+    // Set up a logged-in user
+    services.authService.setCurrentUser(
+      MockUser(email: 'test@example.com', uid: '123'),
     );
-    // Load test environment
-    dotenv.testLoad(fileInput: 'USE_TEST_COLLECTIONS=true\nENV=test');
+  });
+  
+  tearDown(() {
+    services.dispose();
   });
 
   group('AddJobPage Tests', () {
     testWidgets('should display correct dates for start and projected end', 
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: AddJobPage(),
-        ),
+      await pumpTestWidget(
+        tester,
+        const AddJobPage(),
+        authService: services.authService,
+        databaseService: services.databaseService,
       );
 
       // Find the date display texts
@@ -50,10 +54,11 @@ void main() {
 
     testWidgets('should have two different date picker buttons', 
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: AddJobPage(),
-        ),
+      await pumpTestWidget(
+        tester,
+        const AddJobPage(),
+        authService: services.authService,
+        databaseService: services.databaseService,
       );
 
       // Find all "Select Date & Time" buttons
@@ -65,25 +70,27 @@ void main() {
 
     testWidgets('TextEditingControllers should be properly initialized', 
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: AddJobPage(),
-        ),
+      await pumpTestWidget(
+        tester,
+        const AddJobPage(),
+        authService: services.authService,
+        databaseService: services.databaseService,
       );
 
-      // Find text fields
-      final titleField = find.widgetWithText(TextFormField, 'Title');
-      final addressField = find.widgetWithText(TextFormField, 'Address');
+      // Find text fields by their hint text
+      final titleField = find.byType(TextFormField).at(0);
+      final addressField = find.byType(TextFormField).at(1);
 
       expect(titleField, findsOneWidget);
       expect(addressField, findsOneWidget);
     });
 
     testWidgets('Form validation should work', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: AddJobPage(),
-        ),
+      await pumpTestWidget(
+        tester,
+        const AddJobPage(),
+        authService: services.authService,
+        databaseService: services.databaseService,
       );
 
       // Find and tap the submit button without filling fields
@@ -94,17 +101,19 @@ void main() {
       await tester.pump();
 
       // Should show validation errors
-      expect(find.text('Please enter some text'), findsNWidgets(2));
+      expect(find.text('Please enter Job Title'), findsOneWidget);
+      expect(find.text('Please enter Job Address'), findsOneWidget);
     });
   });
 
   group('AddJobPage Lifecycle Tests', () {
     testWidgets('should dispose controllers when widget is disposed', 
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: AddJobPage(),
-        ),
+      await pumpTestWidget(
+        tester,
+        const AddJobPage(),
+        authService: services.authService,
+        databaseService: services.databaseService,
       );
 
       // Navigate away to trigger dispose

@@ -1,35 +1,37 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import '../interfaces/auth_service_interface.dart';
 
-class Auth {
-  static Auth? _instance;
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+/// Firebase implementation of AuthServiceInterface
+class FirebaseAuthService implements AuthServiceInterface {
+  final FirebaseAuth _firebaseAuth;
+  late final Stream<User?> _authStateChanges;
 
-  // Singleton pattern
-  factory Auth() {
-    _instance ??= Auth._internal();
-    return _instance!;
+  FirebaseAuthService({FirebaseAuth? firebaseAuth}) 
+      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance {
+    // Create a broadcast stream that immediately emits the current user
+    _authStateChanges = _firebaseAuth.authStateChanges().asBroadcastStream();
   }
-  
-  Auth._internal();
 
+  @override
   User? get currentUser => _firebaseAuth.currentUser;
 
-  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+  @override
+  Stream<User?> get authStateChanges => _authStateChanges;
 
-  Future<void> sendPasswordResetEmail({
-    required String email,
-  }) async {
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) async {
     await _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
+  @override
   Future<bool> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
-          email: email,
-          password: password
+        email: email,
+        password: password,
       );
       return true;
     } on FirebaseAuthException catch (e) {
@@ -37,6 +39,7 @@ class Auth {
     }
   }
 
+  @override
   Future<void> createUserWithEmailAndPassword({
     required String email,
     required String password,
@@ -47,6 +50,7 @@ class Auth {
     );
   }
 
+  @override
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
