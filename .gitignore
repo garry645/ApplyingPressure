@@ -49,3 +49,10 @@ app.*.map.json
 .flutter_server.pid
 .flutter_web_server.pid
 flutter_web.log
+
+# Environment files
+.env
+.env.development
+.env.production
+# Keep the example file
+!.env.example

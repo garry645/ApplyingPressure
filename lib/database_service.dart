@@ -1,5 +1,6 @@
 import 'package:applying_pressure/strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'customers/customer.dart';
 import 'expenses/expense.dart';
@@ -15,9 +16,16 @@ const String expensesCollection = "Expenses";
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  String currJobCollection = false ? testJobsCollection : jobsCollection;
-  String currCustomerCollection = false ? testCustomersCollection : customersCollection;
-  String currExpenseCollection = false ? testExpensesCollection : expensesCollection;
+  late final String currJobCollection;
+  late final String currCustomerCollection;
+  late final String currExpenseCollection;
+  
+  DatabaseService() {
+    final bool useTestCollections = dotenv.env['USE_TEST_COLLECTIONS'] == 'true';
+    currJobCollection = useTestCollections ? testJobsCollection : jobsCollection;
+    currCustomerCollection = useTestCollections ? testCustomersCollection : customersCollection;
+    currExpenseCollection = useTestCollections ? testExpensesCollection : expensesCollection;
+  }
 
   addJob(Job jobData) async {
     await _db.collection(currJobCollection).withConverter(

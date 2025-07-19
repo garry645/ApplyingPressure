@@ -24,6 +24,7 @@ dependencies:
   settings_ui: ^2.0.2
   image_picker: ^0.8.7+4
   firebase_storage: ^11.1.2
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -34,3 +35,8 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+  
+  assets:
+    - .env
+    - .env.development
+    - .env.production
