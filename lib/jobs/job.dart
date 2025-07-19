@@ -36,7 +36,9 @@ class Job {
         address: data?['address'],
         startDate: (data?['startDate'] as Timestamp).toDate(),
         projectedEndDate: (data?['projectedEndDate'] as Timestamp).toDate(),
-        actualEndDate: (data?['projectedEndDate'] as Timestamp).toDate(),
+        actualEndDate: data?['actualEndDate'] != null 
+            ? (data!['actualEndDate'] as Timestamp).toDate() 
+            : null,
         customer: data?['customer'],
         receiptImageUrl: data?['receiptImageUrl']);
   }
@@ -72,7 +74,7 @@ class Job {
       address: json?['address'] ?? '',
       startDate: json?['startDate']?.toDate() ?? DateTime.now(),
       projectedEndDate: json?['projectedEndDate']?.toDate() ?? DateTime.now(),
-      actualEndDate: json?['actualEndDate']?.toDate() ?? DateTime.now(),
+      actualEndDate: json?['actualEndDate']?.toDate(),
     );
   }
 
@@ -85,6 +87,5 @@ class Job {
         projectedEndDate =
             (doc.data() as dynamic)["projectedEndDate"].toDate() ??
                 DateTime.now(),
-        actualEndDate = (doc.data() as dynamic)["actualEndDate"]?.toDate() ??
-            DateTime.now();
+        actualEndDate = (doc.data() as dynamic)["actualEndDate"]?.toDate();
 }

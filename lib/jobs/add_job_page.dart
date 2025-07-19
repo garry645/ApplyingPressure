@@ -16,8 +16,16 @@ class _AddJobPageState extends State<AddJobPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController addressController = TextEditingController();
 
-  DateTime startDate = DateTime.now();
-  DateTime projectedEndDate = DateTime.now();
+  late DateTime startDate;
+  late DateTime projectedEndDate;
+  
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    startDate = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    projectedEndDate = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+  }
 
   final _formKey = GlobalKey<FormState>();
 
@@ -37,6 +45,13 @@ class _AddJobPageState extends State<AddJobPage> {
             color: Colors.redAccent,
             width: 2,
           )));
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    addressController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,19 +76,19 @@ class _AddJobPageState extends State<AddJobPage> {
                           _createTextFormField("Address", addressController),
                           Text('Start Date & Time: '
                               '${startDate.month}/${startDate.day}/${startDate.year}\t'
-                              '${startDate.hour}:${startDate.minute}',
+                              '${startDate.hour}:${startDate.minute.toString().padLeft(2, '0')}',
                               style: const TextStyle(fontSize: 18.0)),
                           const SizedBox(height: 4.0),
                           ElevatedButton(
                               onPressed: pickStartDateTime,
                               child: const Text("Select Date & Time")),
                           Text('Projected End Date & Time: '
-                              '${startDate.month}/${startDate.day}/${startDate.year}\t'
-                              '${startDate.hour}:${startDate.minute}',
+                              '${projectedEndDate.month}/${projectedEndDate.day}/${projectedEndDate.year}\t'
+                              '${projectedEndDate.hour}:${projectedEndDate.minute.toString().padLeft(2, '0')}',
                               style: const TextStyle(fontSize: 18.0)),
                           const SizedBox(height: 4.0),
                           ElevatedButton(
-                              onPressed: pickDateTime,
+                              onPressed: pickEndDateTime,
                               child: const Text("Select Date & Time")),
                           const SizedBox(height: 8.0),
                           !isLoading
@@ -85,10 +100,16 @@ class _AddJobPageState extends State<AddJobPage> {
 
   Future<DateTime> pickDateTime() async {
     DateTime? date = await pickDate();
-    if (date == null) return DateTime.now();
+    if (date == null) {
+      final now = DateTime.now();
+      return DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    }
 
     TimeOfDay? time = await pickTime();
-    if (time == null) return DateTime.now();
+    if (time == null) {
+      final now = DateTime.now();
+      return DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    }
 
     final dateTime = DateTime(
         date.year,
@@ -107,8 +128,8 @@ class _AddJobPageState extends State<AddJobPage> {
   }
 
   Future pickEndDateTime() async {
-    DateTime projectedEndDate = await pickDateTime();
-    setState(() => startDate = projectedEndDate);
+    DateTime endDateTime = await pickDateTime();
+    setState(() => projectedEndDate = endDateTime);
   }
 
   Future<DateTime?> pickDate() => showDatePicker(

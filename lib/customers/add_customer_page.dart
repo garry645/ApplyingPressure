@@ -38,6 +38,15 @@ class _AddCustomerPageState extends State<AddCustomerPage> {
           )));
 
   @override
+  void dispose() {
+    nameController.dispose();
+    addressController.dispose();
+    phoneNumberController.dispose();
+    sourceController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Use the Customer to create the UI.
     return Scaffold(

@@ -120,9 +120,14 @@ class _JobsListPageState extends State<JobsListPage> {
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
       title: Text(job.title),
-      subtitle: Text("${job.startDate ?? naString} \n"
-          "${job.projectedEndDate ?? naString}"),
+      subtitle: Text(_formatDate(job.startDate) + "\n" +
+          _formatDate(job.projectedEndDate)),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
+  }
+  
+  String _formatDate(DateTime? date) {
+    if (date == null) return naString;
+    return '${date.month}/${date.day}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 }

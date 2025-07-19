@@ -37,6 +37,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
           )));
 
   @override
+  void dispose() {
+    nameController.dispose();
+    descriptionController.dispose();
+    costController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Use the Expense to create the UI.
     return Scaffold(
