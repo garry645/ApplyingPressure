@@ -20,28 +20,6 @@ class CustomerInfoPage extends StatefulWidget {
 
 class _CustomerInfoPageState extends State<CustomerInfoPage> {
   DatabaseService service = DatabaseService();
-  Customer customer = Customer(
-    id: "",
-    name: "",
-    address: "",
-    sourceOfLead: "",
-    phoneNumber: "",
-    potentialCustomers: List.empty());
-  String customerId = "";
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      _initRetrieval();
-    });
-  }
-
-  Future<void> _initRetrieval() async {
-    customerId = ModalRoute.of(context)!.settings.arguments as String;
-    customer = await service.retrieveCustomerById(customerId);
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +37,16 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
                 child: Wrap(children: [
                   Column(
                     children: [
-                      Text('${customer.name}\n\n', style: headerText()),
-                      Text('${customer.phoneNumber}\n\n', style: headerText()),
+                      Text('${widget.customer.name}\n\n', style: headerText()),
+                      Text('${widget.customer.phoneNumber}\n\n', style: headerText()),
                       Column(children: [
                         Text('Address: ', style: subTitleText()),
-                        Text(customer.address ?? naString, style: subTitleText()),
+                        Text(widget.customer.address ?? naString, style: subTitleText()),
                       ]),
                       const SizedBox(width: 8),
                       Column(children: [
                         Text('Source Of Lead: ', style: subTitleText()),
-                        Text(customer.sourceOfLead ?? naString, style: subTitleText()),
+                        Text(widget.customer.sourceOfLead ?? naString, style: subTitleText()),
                       ])
                     ],
                   )
