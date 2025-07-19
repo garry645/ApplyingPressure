@@ -96,8 +96,7 @@ class _LoginPageState extends State<LoginPage> {
             child: ElevatedButton(
                 style: ButtonStyle(
                     minimumSize: MaterialStateProperty.all(const Size(200, 50)),
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(255, 83, 80, 80))),
+                    backgroundColor: MaterialStateProperty.all<Color>(Colors.blue)),
                 onPressed: (() {
                   if (_formKey.currentState!.validate()) {
                     setState(() { isLoading = true; });
