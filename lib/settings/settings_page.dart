@@ -27,9 +27,17 @@ class SettingsPage extends StatelessWidget {
                         SettingsTile.navigation(
                           leading: const Icon(Icons.lock),
                           title: const Text('Log Out'),
-                          onPressed: (context) { 
+                          onPressed: (context) async { 
                             final authService = ServiceProvider.getAuthService(context);
-                            authService.signOut(); 
+                            await authService.signOut();
+                            
+                            // Navigate to root and remove all routes from stack
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/', 
+                                (route) => false,
+                              );
+                            }
                           }
                         ),
                     ],
