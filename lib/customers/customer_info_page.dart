@@ -6,6 +6,7 @@ import '../strings.dart';
 import '../services/service_provider.dart';
 import '../shared/edit_form_page.dart';
 import '../shared/form_field_config.dart';
+import '../shared/clickable_phone_number.dart';
 
 const String loadingString = "Loading";
 
@@ -72,7 +73,11 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
                   Column(
                     children: [
                       Text('${customer.name}\n\n', style: headerText()),
-                      Text('${customer.phoneNumber}\n\n', style: headerText()),
+                      ClickablePhoneNumber(
+                        phoneNumber: customer.phoneNumber,
+                        style: headerText(),
+                      ),
+                      const SizedBox(height: 16),
                       Column(children: [
                         Text('Address: ', style: subTitleText()),
                         Text(customer.address ?? naString, style: subTitleText()),

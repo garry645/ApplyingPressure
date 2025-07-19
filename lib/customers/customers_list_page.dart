@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
 import '../routes.dart';
+import '../shared/clickable_phone_number.dart';
 import 'add_customer_page.dart';
 
 class CustomersListPage extends StatefulWidget {
@@ -124,9 +125,17 @@ class _CustomersListPageState extends State<CustomersListPage> {
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
       title: Text(customer.name),
-      subtitle:
-      Text("${customer.address ?? naString} \n"
-          "${customer.phoneNumber ?? naString}"),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(customer.address ?? naString),
+          ClickablePhoneNumber(
+            phoneNumber: customer.phoneNumber,
+            style: Theme.of(context).textTheme.bodySmall,
+            showUnderline: false,
+          ),
+        ],
+      ),
       trailing: const Icon(Icons.arrow_right_sharp),
     );
   }

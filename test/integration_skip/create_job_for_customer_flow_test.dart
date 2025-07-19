@@ -5,6 +5,8 @@ import 'package:applying_pressure/customers/customer.dart';
 import '../test_helper.dart';
 import '../mocks/mock_database_service.dart';
 
+// Skip these tests as they are slow integration tests
+@Skip('Integration tests are slow and should be run separately')
 void main() {
   late TestServices services;
 

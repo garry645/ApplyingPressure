@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 import '../interfaces/database_service_interface.dart';
 import '../../customers/customer.dart';
 import '../../expenses/expense.dart';
@@ -28,10 +29,29 @@ class FirebaseDatabaseService implements DatabaseServiceInterface {
   
   FirebaseDatabaseService({FirebaseFirestore? firestore}) 
       : _db = firestore ?? FirebaseFirestore.instance {
-    final bool useTestCollections = dotenv.env['USE_TEST_COLLECTIONS'] == 'true';
+    bool useTestCollections = false;
+    
+    // For web builds, always use production collections
+    if (kIsWeb) {
+      print('[FirebaseDatabaseService] Web build detected, using production collections');
+      useTestCollections = false;
+    } else {
+      // For mobile/desktop, check dotenv
+      try {
+        final String? testCollectionsSetting = dotenv.env['USE_TEST_COLLECTIONS'];
+        useTestCollections = testCollectionsSetting == 'true';
+        print('[FirebaseDatabaseService] USE_TEST_COLLECTIONS: $testCollectionsSetting');
+      } catch (e) {
+        print('[FirebaseDatabaseService] Error reading dotenv, defaulting to production');
+        useTestCollections = false;
+      }
+    }
+    
+    print('[FirebaseDatabaseService] useTestCollections: $useTestCollections');
     currJobCollection = useTestCollections ? testJobsCollection : jobsCollection;
     currCustomerCollection = useTestCollections ? testCustomersCollection : customersCollection;
     currExpenseCollection = useTestCollections ? testExpensesCollection : expensesCollection;
+    print('[FirebaseDatabaseService] Using collections: Jobs=$currJobCollection, Customers=$currCustomerCollection, Expenses=$currExpenseCollection');
   }
 
   // Job operations
