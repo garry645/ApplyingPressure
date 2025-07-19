@@ -1,150 +1,61 @@
 import 'package:flutter/material.dart';
-import '../services/service_provider.dart';
-import '../services/interfaces/database_service_interface.dart';
 import '../routes.dart';
+import '../services/service_provider.dart';
+import '../shared/edit_form_page.dart';
+import '../shared/form_field_config.dart';
 import 'expense.dart';
 
-class AddExpensePage extends StatefulWidget {
+class AddExpensePage extends StatelessWidget {
   const AddExpensePage({super.key});
 
   static const routeName = Routes.addExpense;
 
   @override
-  State<AddExpensePage> createState() => _AddExpensePageState();
-}
-
-class _AddExpensePageState extends State<AddExpensePage> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController costController = TextEditingController();//MoneyMaskedTextController(decimalSeparator: '.', thousandSeparator: ','); //after
-
-
-  final _formKey = GlobalKey<FormState>();
-
-  bool isLoading = false;
-
-  final textStyle = const TextStyle(
-    color: Colors.white,
-    fontSize: 22.0,
-    letterSpacing: 1,
-    fontWeight: FontWeight.bold,
-  );
-
-  final inputDecoration = InputDecoration(
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: const BorderSide(
-            color: Colors.redAccent,
-            width: 2,
-          )));
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    descriptionController.dispose();
-    costController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // Use the Expense to create the UI.
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Add Expense"),
+    return EditFormPage<Expense>(
+      fieldConfigs: [
+        const FormFieldConfig(
+          name: 'name',
+          label: 'Name',
+          hintText: 'Enter Expense Name',
+          isRequired: true,
         ),
-        body: SingleChildScrollView(
-            child: Form(
-                key: _formKey,
-                child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Name'),
-                          const SizedBox(height: 8.0),
-                          _createTextFormField("Name", nameController),
-                          const SizedBox(height: 8.0),
-                          const Text('Cost'),
-                          const SizedBox(height: 8.0),
-                          _createMoneyFormField("Cost", costController),
-                          const SizedBox(height: 8.0),
-                          const Text('Description'),
-                          const SizedBox(height: 8.0),
-                          _createTextFormField("Description", descriptionController),
-                          const SizedBox(height: 8.0),
-                          !isLoading ? _createSubmitButton()
-                              : const Center(child: CircularProgressIndicator()),
-                        ]
-                    )
-                )
-            )
-        )
+        FormFieldConfig(
+          name: 'cost',
+          label: 'Cost',
+          hintText: 'Enter Expense Cost',
+          keyboardType: TextInputType.number,
+          isRequired: true,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter Expense Cost';
+            }
+            final cost = double.tryParse(value);
+            if (cost == null || cost < 0) {
+              return 'Please enter a valid cost';
+            }
+            return null;
+          },
+        ),
+        const FormFieldConfig(
+          name: 'description',
+          label: 'Description',
+          hintText: 'Enter Expense Description',
+          isRequired: true,
+          maxLines: 3,
+        ),
+      ],
+      modelBuilder: (formData) {
+        return Expense(
+          name: formData['name'] as String,
+          cost: double.parse(formData['cost'] as String),
+          description: formData['description'] as String,
+        );
+      },
+      onSave: (expense) async {
+        final service = ServiceProvider.getDatabaseService(context);
+        await service.addExpense(expense);
+      },
     );
   }
-
-  Widget _createTextFormField(String field, TextEditingController controller) {
-    return Container(
-        margin: const EdgeInsets.only(bottom: 10.0),
-        child: TextFormField(
-          controller: controller,
-          keyboardType: TextInputType.text,
-          decoration: inputDecoration.copyWith(hintText: "Enter Expense $field"),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter Expense $field';
-            }
-            return null;
-          },
-        ));
-  }
-
-  Widget _createMoneyFormField(String field, TextEditingController controller) {
-    return Container(
-        margin: const EdgeInsets.only(bottom: 10.0),
-        child: TextFormField(
-          controller: controller,
-          keyboardType: TextInputType.text,
-          decoration: inputDecoration.copyWith(hintText: "Enter Expense $field"),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter Expense $field';
-            }
-            return null;
-          },
-        ));
-  }
-
-  Widget _createSubmitButton() {
-    return Center(
-        child: Container(
-          margin: const EdgeInsets.only(top: 10.0),
-          child: ElevatedButton(
-              style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(const Size(200, 50)),
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      const Color.fromARGB(255, 83, 80, 80))),
-              onPressed: (() async {
-                if (_formKey.currentState!.validate()) {
-                  DatabaseServiceInterface service = ServiceProvider.getDatabaseService(context);
-                  Expense expense = Expense(
-                      name: nameController.text,
-                      description: descriptionController.text,
-                      cost: double.parse(costController.text));
-
-                  setState(() {
-                    isLoading = true;
-                  });
-                  await service.addExpense(expense);
-                  setState(() {
-                    isLoading = false;
-                  });
-                  if (!mounted) return;
-                  Navigator.of(context).pop();
-                }
-              }),
-              child: const Text("Submit", style: TextStyle(fontSize: 20))),
-        ));
-  }
-
 }

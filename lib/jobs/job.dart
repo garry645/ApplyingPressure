@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../customers/customer.dart';
+import '../shared/editable_model.dart';
 
-class Job {
+class Job extends EditableModel {
   final String? id;
   final String title;
   String status = "Pending";
@@ -30,12 +31,12 @@ class Job {
   ) {
     final data = snapshot.data();
     return Job(
-        id: data?['id'],
-        title: data?['title'],
+        id: snapshot.id,
+        title: data?['title'] ?? '',
         status: data?['status'] ?? "Pending",
-        address: data?['address'],
-        startDate: (data?['startDate'] as Timestamp).toDate(),
-        projectedEndDate: (data?['projectedEndDate'] as Timestamp).toDate(),
+        address: data?['address'] ?? '',
+        startDate: data?['startDate'] != null ? (data!['startDate'] as Timestamp).toDate() : null,
+        projectedEndDate: data?['projectedEndDate'] != null ? (data!['projectedEndDate'] as Timestamp).toDate() : null,
         actualEndDate: data?['actualEndDate'] != null 
             ? (data!['actualEndDate'] as Timestamp).toDate() 
             : null,
@@ -88,4 +89,43 @@ class Job {
             (doc.data() as dynamic)["projectedEndDate"].toDate() ??
                 DateTime.now(),
         actualEndDate = (doc.data() as dynamic)["actualEndDate"]?.toDate();
+
+  @override
+  Map<String, dynamic> toFormData() {
+    return {
+      'title': title,
+      'address': address,
+      'startDate': startDate,
+      'projectedEndDate': projectedEndDate,
+      'actualEndDate': actualEndDate,
+      'status': status,
+    };
+  }
+
+  @override
+  String get modelTypeName => 'Job';
+
+  Job copyWith({
+    String? id,
+    String? title,
+    String? status,
+    String? address,
+    DateTime? startDate,
+    DateTime? projectedEndDate,
+    DateTime? actualEndDate,
+    Customer? customer,
+    String? receiptImageUrl,
+  }) {
+    return Job(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      status: status ?? this.status,
+      address: address ?? this.address,
+      startDate: startDate ?? this.startDate,
+      projectedEndDate: projectedEndDate ?? this.projectedEndDate,
+      actualEndDate: actualEndDate ?? this.actualEndDate,
+      customer: customer ?? this.customer,
+      receiptImageUrl: receiptImageUrl ?? this.receiptImageUrl,
+    );
+  }
 }

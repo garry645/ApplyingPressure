@@ -143,10 +143,12 @@ class MockDatabaseService implements DatabaseServiceInterface {
   @override
   Stream<Customer?> getCustomerStreamById(String id) {
     final controller = StreamController<Customer?>();
-    final customer = _customers.firstWhere(
-      (c) => c.id == id,
-      orElse: () => null as Customer,
-    );
+    Customer? customer;
+    try {
+      customer = _customers.firstWhere((c) => c.id == id);
+    } catch (e) {
+      customer = null;
+    }
     controller.add(customer);
     return controller.stream;
   }

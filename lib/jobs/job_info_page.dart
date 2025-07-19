@@ -7,6 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
 import '../services/interfaces/storage_service_interface.dart';
+import '../shared/edit_form_page.dart';
+import '../shared/form_field_config.dart';
+import '../shared/date_time_picker_field.dart';
 
 class JobInfoPage extends StatefulWidget {
   final Job job;
@@ -41,24 +44,46 @@ class _JobInfoPageState extends State<JobInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    Job job = widget.job;
-    // Use the Job to create the UI.
-    return _jobInfoPage(job); /*FutureBuilder<Job>(future: _initRetrieval(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text("data");//_jobInfoPage(Job(title: "Error", address: "Error"));
-          } else if (snapshot.hasData) {
-            Job job = snapshot.data!;
-            return Text("data");//_jobInfoPage(job);
-          } else {
-            return Text("data");//_jobInfoPage(Job(title: "Loading", address: "Loading"));
-          }
-        });*/
+    return StreamBuilder<List<Job>>(
+      stream: databaseService.getJobs(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        }
+        
+        if (!snapshot.hasData) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+        
+        // Find the job with matching ID
+        final job = snapshot.data!.firstWhere(
+          (j) => j.id == widget.job.id,
+          orElse: () => widget.job,
+        );
+        
+        return _jobInfoPage(job);
+      },
+    );
   }
 
   Widget _jobInfoPage(Job job) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              _navigateToEditPage(job);
+            },
+          ),
+        ],
+      ),
       backgroundColor: Colors.grey[100],
       body: Center(
           child: Column(children: [
@@ -156,5 +181,85 @@ class _JobInfoPageState extends State<JobInfoPage> {
   String getJobEndDateString(Job? job) {
     return '${job?.projectedEndDate?.month}/${job?.projectedEndDate?.day}/${job?.projectedEndDate?.year} '
         '${job?.projectedEndDate?.hour}:${job?.projectedEndDate?.minute?.toString().padLeft(2, '0')}\n\n';
+  }
+
+  void _navigateToEditPage(Job job) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditFormPage<Job>(
+          existingModel: job,
+          fieldConfigs: [
+            const FormFieldConfig(
+              name: 'title',
+              label: 'Title',
+              hintText: 'Enter Job Title',
+              isRequired: true,
+            ),
+            const FormFieldConfig(
+              name: 'address',
+              label: 'Address',
+              hintText: 'Enter Job Address',
+              isRequired: true,
+            ),
+            FormFieldConfig(
+              name: 'startDate',
+              label: '',
+              hintText: '',
+              customWidget: StatefulBuilder(
+                builder: (context, setState) {
+                  DateTime startDate = job.startDate ?? DateTime.now();
+                  return DateTimePickerField(
+                    label: 'Start Date & Time',
+                    initialDate: startDate,
+                    onDateTimeChanged: (newDate) {
+                      startDate = newDate;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        FormDataUpdater.of(context)?.updateFormData('startDate', newDate);
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+            FormFieldConfig(
+              name: 'projectedEndDate',
+              label: '',
+              hintText: '',
+              customWidget: StatefulBuilder(
+                builder: (context, setState) {
+                  DateTime projectedEndDate = job.projectedEndDate ?? DateTime.now();
+                  return DateTimePickerField(
+                    label: 'Projected End Date & Time',
+                    initialDate: projectedEndDate,
+                    onDateTimeChanged: (newDate) {
+                      projectedEndDate = newDate;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        FormDataUpdater.of(context)?.updateFormData('projectedEndDate', newDate);
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+          modelBuilder: (formData) {
+            return Job(
+              id: job.id,
+              title: formData['title']?.toString() ?? job.title,
+              address: formData['address']?.toString() ?? job.address,
+              startDate: formData['startDate'] as DateTime? ?? job.startDate,
+              projectedEndDate: formData['projectedEndDate'] as DateTime? ?? job.projectedEndDate,
+              actualEndDate: job.actualEndDate,
+              customer: job.customer,
+              receiptImageUrl: job.receiptImageUrl,
+            );
+          },
+          onSave: (updatedJob) async {
+            await databaseService.updateJob(job.id!, updatedJob);
+          },
+        ),
+      ),
+    );
   }
 }

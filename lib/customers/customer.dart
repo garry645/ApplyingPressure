@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../strings.dart';
-class Customer {
+import '../shared/editable_model.dart';
+class Customer extends EditableModel {
   final String? id;
   final String name;
   final String? address;
@@ -23,8 +24,8 @@ class Customer {
       ) {
     final data = snapshot.data();
     return Customer(
-        id: data?['id'],
-        name: data?['name'],
+        id: snapshot.id,
+        name: data?['name'] ?? '',
         address: data?['address'] ?? naString,
         sourceOfLead: data?['sourceOfLead'] ?? naString,
         phoneNumber: data?['phoneNumber'] ?? naString,
@@ -54,10 +55,40 @@ class Customer {
 
   Customer.fromDocumentSnapshot(DocumentSnapshot doc) 
     : id = doc.id,
-      name = (doc.data() as dynamic)['name'] ?? naString,
+      name = (doc.data() as dynamic)['name'] ?? '',
       address = (doc.data() as dynamic)["address"] ?? naString,
       sourceOfLead = (doc.data() as dynamic)["sourceOfLead"] ?? naString,
       phoneNumber = (doc.data() as dynamic)["phoneNumber"] ?? naString,
       potentialCustomers = [];
 
+  @override
+  Map<String, dynamic> toFormData() {
+    return {
+      'name': name,
+      'address': address,
+      'phoneNumber': phoneNumber,
+      'sourceOfLead': sourceOfLead,
+    };
+  }
+
+  @override
+  String get modelTypeName => 'Customer';
+
+  Customer copyWith({
+    String? id,
+    String? name,
+    String? address,
+    String? sourceOfLead,
+    String? phoneNumber,
+    List<Customer>? potentialCustomers,
+  }) {
+    return Customer(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      address: address ?? this.address,
+      sourceOfLead: sourceOfLead ?? this.sourceOfLead,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      potentialCustomers: potentialCustomers ?? this.potentialCustomers,
+    );
+  }
 }

@@ -101,8 +101,8 @@ void main() {
       await tester.pump();
 
       // Should show validation errors
-      expect(find.text('Please enter Job Title'), findsOneWidget);
-      expect(find.text('Please enter Job Address'), findsOneWidget);
+      expect(find.text('Please enter Title:'), findsOneWidget);
+      expect(find.text('Please enter Address:'), findsOneWidget);
     });
     
     testWidgets('Should navigate back after successful job creation', 
