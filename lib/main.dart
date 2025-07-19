@@ -12,6 +12,13 @@ import 'services/interfaces/storage_service_interface.dart';
 import 'services/firebase/firebase_auth_service.dart';
 import 'services/firebase/firebase_database_service.dart';
 import 'services/firebase/firebase_storage_service.dart';
+import 'home/home_page.dart';
+import 'login/login_page.dart';
+import 'jobs/add_job_page.dart';
+import 'customers/add_customer_page.dart';
+import 'expenses/add_expense_page.dart';
+import 'settings/settings_page.dart';
+import 'routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +76,14 @@ class ApplyingPressureApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: const WidgetTree(),
+        routes: {
+          Routes.home: (context) => const HomePage(),
+          Routes.login: (context) => const LoginPage(),
+          Routes.addJob: (context) => const AddJobPage(),
+          Routes.addCustomer: (context) => const AddCustomerPage(),
+          Routes.addExpense: (context) => const AddExpensePage(),
+          Routes.settings: (context) => const SettingsPage(),
+        },
       ),
     );
   }

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
+import '../routes.dart';
 import 'job.dart';
 
 class AddJobPage extends StatefulWidget {
   const AddJobPage({super.key});
 
-  static const routeName = '/addJobPage';
+  static const routeName = Routes.addJob;
 
   @override
   State<AddJobPage> createState() => _AddJobPageState();

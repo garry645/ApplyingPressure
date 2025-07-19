@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
+import '../routes.dart';
 import 'add_expense_page.dart';
 
 class ExpensesListPage extends StatefulWidget {
@@ -66,7 +67,7 @@ class _ExpensesListPageState extends State<ExpensesListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.pushNamed(context, AddExpensePage.routeName);
+          Navigator.pushNamed(context, Routes.addExpense);
         }),
         tooltip: 'add',
         child: const Icon(Icons.add),

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
+import '../routes.dart';
 import 'customer.dart';
 
 class AddCustomerPage extends StatefulWidget {
   const AddCustomerPage({super.key});
 
-  static const routeName = '/addCustomerPage';
+  static const routeName = Routes.addCustomer;
 
   @override
   State<AddCustomerPage> createState() => _AddCustomerPageState();

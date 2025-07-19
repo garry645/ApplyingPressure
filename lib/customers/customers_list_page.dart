@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
+import '../routes.dart';
 import 'add_customer_page.dart';
 
 class CustomersListPage extends StatefulWidget {
@@ -67,7 +68,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.pushNamed(context, AddCustomerPage.routeName);
+          Navigator.pushNamed(context, Routes.addCustomer);
         }),
         tooltip: 'add',
         child: const Icon(Icons.add),

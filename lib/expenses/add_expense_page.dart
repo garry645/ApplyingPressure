@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
+import '../routes.dart';
 import 'expense.dart';
 
 class AddExpensePage extends StatefulWidget {
   const AddExpensePage({super.key});
 
-  static const routeName = '/addExpensePage';
+  static const routeName = Routes.addExpense;
 
   @override
   State<AddExpensePage> createState() => _AddExpensePageState();

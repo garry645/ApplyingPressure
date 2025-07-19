@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../services/service_provider.dart';
 import '../services/interfaces/database_service_interface.dart';
+import '../routes.dart';
 import 'job.dart';
 
 class JobsListPage extends StatefulWidget {
@@ -92,8 +93,7 @@ class _JobsListPageState extends State<JobsListPage> {
           )),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddJobPage()));
+          Navigator.pushNamed(context, Routes.addJob);
         }),
         tooltip: 'add',
         child: const Icon(Icons.add),
