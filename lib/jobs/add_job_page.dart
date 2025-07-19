@@ -184,6 +184,8 @@ class _AddJobPageState extends State<AddJobPage> {
               setState(() {
                 isLoading = false;
               });
+              if (!mounted) return;
+              Navigator.of(context).pop();
             }
           }),
           child: const Text("Submit", style: TextStyle(fontSize: 20))),

@@ -104,6 +104,58 @@ void main() {
       expect(find.text('Please enter Job Title'), findsOneWidget);
       expect(find.text('Please enter Job Address'), findsOneWidget);
     });
+    
+    testWidgets('Should navigate back after successful job creation', 
+        (WidgetTester tester) async {
+      // Create a simple navigation stack to test
+      await tester.pumpWidget(
+        createTestWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AddJobPage(),
+                        ),
+                      );
+                    },
+                    child: const Text('Go to Add Job'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          authService: services.authService,
+          databaseService: services.databaseService,
+        ),
+      );
+
+      // Navigate to AddJobPage
+      await tester.tap(find.text('Go to Add Job'));
+      await tester.pumpAndSettle();
+
+      // Verify we're on the AddJobPage
+      expect(find.byType(AddJobPage), findsOneWidget);
+
+      // Fill in the form
+      await tester.enterText(find.byType(TextFormField).at(0), 'Test Job');
+      await tester.enterText(find.byType(TextFormField).at(1), '123 Test St');
+
+      // Find and tap the submit button
+      final submitButton = find.widgetWithText(ElevatedButton, 'Submit');
+      await tester.tap(submitButton);
+      
+      // Wait for all animations and async operations to complete
+      await tester.pumpAndSettle();
+
+      // Should navigate back to the previous screen
+      expect(find.text('Go to Add Job'), findsOneWidget);
+      expect(find.byType(AddJobPage), findsNothing);
+    });
   });
 
   group('AddJobPage Lifecycle Tests', () {
