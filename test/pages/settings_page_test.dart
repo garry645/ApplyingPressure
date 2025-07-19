@@ -42,8 +42,12 @@ void main() {
       await tester.pumpWidget(createTestWidget());
 
       expect(find.text('Settings'), findsOneWidget); // App bar title
-      expect(find.text('Common'), findsOneWidget); // Section title
+      expect(find.text('User Information'), findsOneWidget); // User section
+      expect(find.text('User'), findsOneWidget);
+      expect(find.text('test@example.com'), findsOneWidget); // User email
+      expect(find.text('Common'), findsOneWidget); // Common section title
       expect(find.text('Log Out'), findsOneWidget);
+      expect(find.byIcon(Icons.person), findsOneWidget);
       expect(find.byIcon(Icons.lock), findsOneWidget);
     });
 
@@ -51,15 +55,33 @@ void main() {
       await tester.pumpWidget(createTestWidget());
 
       expect(find.byType(SettingsList), findsOneWidget);
-      expect(find.byType(SettingsSection), findsOneWidget);
-      expect(find.byType(SettingsTile), findsOneWidget);
+      expect(find.byType(SettingsSection), findsNWidgets(2)); // User Info + Common sections
+      expect(find.byType(SettingsTile), findsNWidgets(2)); // User tile + Logout tile
     });
 
     testWidgets('logout tile is navigable', (WidgetTester tester) async {
       await tester.pumpWidget(createTestWidget());
 
-      final logoutTile = tester.widget<SettingsTile>(find.byType(SettingsTile));
+      // Find the logout tile specifically (second SettingsTile)
+      final logoutTile = tester.widgetList<SettingsTile>(find.byType(SettingsTile)).last;
       expect(logoutTile.onPressed, isNotNull);
+    });
+
+    testWidgets('shows user email when authenticated', (WidgetTester tester) async {
+      await tester.pumpWidget(createTestWidget());
+
+      expect(find.text('test@example.com'), findsOneWidget);
+      expect(find.text('Not logged in'), findsNothing);
+    });
+
+    testWidgets('shows not logged in when user is null', (WidgetTester tester) async {
+      // Set user to null
+      mockAuthService.setCurrentUser(null);
+      
+      await tester.pumpWidget(createTestWidget());
+
+      expect(find.text('Not logged in'), findsOneWidget);
+      expect(find.text('test@example.com'), findsNothing);
     });
   });
 }

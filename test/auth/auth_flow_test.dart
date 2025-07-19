@@ -145,11 +145,15 @@ void main() {
         expect(mockAuthService.currentUser, isNull);
       });
 
-      testWidgets('logout button is accessible in settings', (WidgetTester tester) async {
+      testWidgets('settings page shows user info and logout', (WidgetTester tester) async {
         await tester.pumpWidget(createTestApp(home: const SettingsPage()));
 
         expect(find.text('Settings'), findsOneWidget);
+        expect(find.text('User Information'), findsOneWidget);
+        expect(find.text('User'), findsOneWidget);
+        expect(find.text('test@example.com'), findsOneWidget);
         expect(find.text('Log Out'), findsOneWidget);
+        expect(find.byIcon(Icons.person), findsOneWidget);
         expect(find.byIcon(Icons.lock), findsOneWidget);
       });
     });

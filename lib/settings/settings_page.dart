@@ -22,6 +22,16 @@ class SettingsPage extends StatelessWidget {
         body: SettingsList(
                 sections: [
                     SettingsSection(
+                      title: const Text('User Information'),
+                      tiles: <SettingsTile>[
+                        SettingsTile(
+                          leading: const Icon(Icons.person),
+                          title: const Text('User'),
+                          value: _buildUserInfo(context),
+                        ),
+                      ],
+                    ),
+                    SettingsSection(
                       title: const Text('Common'),
                       tiles: <SettingsTile>[
                         SettingsTile.navigation(
@@ -46,16 +56,26 @@ class SettingsPage extends StatelessWidget {
               ));
   }
 
-
-
-/*
-  Padding(
-  padding: const EdgeInsets.all(16.0),
-  child: ListView.separated(
-  itemCount: 2,
-  separatorBuilder: (context, index) =>
-  const SizedBox(height: 10),
-  itemBuilder: (context, index) {
-  return Text("SOMETHING");//makeListTile(Auth().signOut(), "Logout", "logout");
-  })));*/
+  Widget _buildUserInfo(BuildContext context) {
+    final authService = ServiceProvider.getAuthService(context);
+    final user = authService.currentUser;
+    
+    if (user?.email != null) {
+      return Text(
+        user!.email!,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.grey,
+        ),
+      );
+    }
+    
+    return const Text(
+      'Not logged in',
+      style: TextStyle(
+        fontSize: 14,
+        color: Colors.grey,
+      ),
+    );
+  }
 }
