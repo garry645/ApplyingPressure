@@ -14,6 +14,7 @@ import 'services/firebase/firebase_database_service.dart';
 import 'services/firebase/firebase_storage_service.dart';
 import 'home/home_page.dart';
 import 'login/login_page.dart';
+import 'login/forgot_password_page.dart';
 import 'jobs/add_job_page.dart';
 import 'customers/add_customer_page.dart';
 import 'expenses/add_expense_page.dart';
@@ -79,6 +80,7 @@ class ApplyingPressureApp extends StatelessWidget {
         routes: {
           Routes.home: (context) => const HomePage(),
           Routes.login: (context) => const LoginPage(),
+          Routes.forgotPassword: (context) => const ForgotPasswordPage(),
           Routes.addJob: (context) => const AddJobPage(),
           Routes.addCustomer: (context) => const AddCustomerPage(),
           Routes.addExpense: (context) => const AddExpensePage(),

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/service_provider.dart';
+import '../routes.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -55,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                           _createHintField("Password"),
                           _createTextFormField("Password", passwordController),
                           _createSubmitButton(),
+                          _createForgotPasswordButton(),
                           _createErrorHint()
                         ])))));
   }
@@ -130,5 +132,23 @@ class _LoginPageState extends State<LoginPage> {
     return Center(child: Container(
         margin: const EdgeInsets.only(top: 10.0),
         child: Text(isError ? loginErrorString : "")));
+  }
+
+  Widget _createForgotPasswordButton() {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          Navigator.pushNamed(context, Routes.forgotPassword);
+        },
+        child: const Text(
+          'Forgot Password?',
+          style: TextStyle(
+            color: Colors.blue,
+            fontSize: 16,
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -2,6 +2,7 @@
 class Routes {
   // Auth routes
   static const String login = '/login';
+  static const String forgotPassword = '/forgotPassword';
   
   // Main navigation
   static const String home = '/home';
