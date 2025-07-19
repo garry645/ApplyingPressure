@@ -157,6 +157,6 @@ class _JobsListPageState extends State<JobsListPage> {
   
   String _formatDate(DateTime? date) {
     if (date == null) return naString;
-    return '${date.month}/${date.day}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    return '${date.month}/${date.day}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }

@@ -63,7 +63,7 @@ class _DateTimePickerFieldState extends State<DateTimePickerField> {
 
   String get _formattedDateTime {
     return '${_selectedDateTime.month}/${_selectedDateTime.day}/${_selectedDateTime.year} '
-           '${_selectedDateTime.hour}:${_selectedDateTime.minute.toString().padLeft(2, '0')}';
+           '${_selectedDateTime.hour.toString().padLeft(2, '0')}:${_selectedDateTime.minute.toString().padLeft(2, '0')}';
   }
 
   @override

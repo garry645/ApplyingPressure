@@ -175,12 +175,12 @@ class _JobInfoPageState extends State<JobInfoPage> {
 
   String getJobStartDateString(Job? job) {
     return '${job?.startDate?.month}/${job?.startDate?.day}/${job?.startDate?.year} '
-        '${job?.startDate?.hour}:${job?.startDate?.minute?.toString().padLeft(2, '0')}\n\n';
+        '${job?.startDate?.hour.toString().padLeft(2, '0')}:${job?.startDate?.minute?.toString().padLeft(2, '0')}\n\n';
   }
 
   String getJobEndDateString(Job? job) {
     return '${job?.projectedEndDate?.month}/${job?.projectedEndDate?.day}/${job?.projectedEndDate?.year} '
-        '${job?.projectedEndDate?.hour}:${job?.projectedEndDate?.minute?.toString().padLeft(2, '0')}\n\n';
+        '${job?.projectedEndDate?.hour.toString().padLeft(2, '0')}:${job?.projectedEndDate?.minute?.toString().padLeft(2, '0')}\n\n';
   }
 
   void _navigateToEditPage(Job job) {

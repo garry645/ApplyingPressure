@@ -61,16 +61,30 @@ void main() {
 
     test('Midnight should format correctly', () {
       final midnight = DateTime(2024, 1, 1, 0, 0);
-      final formatted = '${midnight.hour}:${midnight.minute.toString().padLeft(2, '0')}';
+      final formatted = '${midnight.hour.toString().padLeft(2, '0')}:${midnight.minute.toString().padLeft(2, '0')}';
       
-      expect(formatted, equals('0:00'));
+      expect(formatted, equals('00:00'));
     });
 
     test('Noon should format correctly', () {
       final noon = DateTime(2024, 1, 1, 12, 0);
-      final formatted = '${noon.hour}:${noon.minute.toString().padLeft(2, '0')}';
+      final formatted = '${noon.hour.toString().padLeft(2, '0')}:${noon.minute.toString().padLeft(2, '0')}';
       
       expect(formatted, equals('12:00'));
+    });
+
+    test('Early morning hours should be padded', () {
+      final earlyMorning = DateTime(2024, 1, 1, 1, 30);
+      final formatted = '${earlyMorning.hour.toString().padLeft(2, '0')}:${earlyMorning.minute.toString().padLeft(2, '0')}';
+      
+      expect(formatted, equals('01:30'));
+    });
+
+    test('Single digit hour should be padded', () {
+      final singleDigit = DateTime(2024, 1, 1, 9, 5);
+      final formatted = '${singleDigit.hour.toString().padLeft(2, '0')}:${singleDigit.minute.toString().padLeft(2, '0')}';
+      
+      expect(formatted, equals('09:05'));
     });
   });
 
