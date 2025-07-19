@@ -11,7 +11,7 @@ abstract class DatabaseServiceInterface {
   String get currExpenseCollection;
 
   // Job operations
-  Future<void> addJob(Job jobData);
+  Future<Job> addJob(Job jobData);
   Future<void> updateJob(String id, Job newJobData);
   Future<void> deleteJob(String documentId);
   Stream<List<Job>> retrieveJobs();

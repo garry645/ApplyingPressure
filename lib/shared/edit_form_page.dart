@@ -13,6 +13,7 @@ class EditFormPage<T extends EditableModel> extends StatefulWidget {
   final SaveFunction<T> onSave;
   final FormMode mode;
   final String? customTitle;
+  final bool shouldPopAfterSave;
 
   const EditFormPage({
     super.key,
@@ -21,6 +22,7 @@ class EditFormPage<T extends EditableModel> extends StatefulWidget {
     required this.modelBuilder,
     required this.onSave,
     this.customTitle,
+    this.shouldPopAfterSave = true,
   }) : mode = existingModel == null ? FormMode.add : FormMode.edit;
 
   @override
@@ -53,7 +55,13 @@ class _EditFormPageState<T extends EditableModel> extends State<EditFormPage<T>>
   void _initializeControllers() {
     for (final config in widget.fieldConfigs) {
       if (config.customWidget == null) {
-        _controllers[config.name] = TextEditingController();
+        _controllers[config.name] = TextEditingController(
+          text: config.initialValue,
+        );
+        // Also set initial form data
+        if (config.initialValue != null) {
+          _formData[config.name] = config.initialValue;
+        }
       }
     }
   }
@@ -188,7 +196,9 @@ class _EditFormPageState<T extends EditableModel> extends State<EditFormPage<T>>
         });
 
         if (!mounted) return;
-        Navigator.of(context).pop();
+        if (widget.shouldPopAfterSave) {
+          Navigator.of(context).pop();
+        }
       } catch (e) {
         setState(() {
           _isLoading = false;

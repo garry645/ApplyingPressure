@@ -12,6 +12,7 @@ class Job extends EditableModel {
   final DateTime? projectedEndDate;
   DateTime? actualEndDate;
   Customer? customer;
+  String? customerId;
   String? receiptImageUrl;
 
   Job(
@@ -23,7 +24,13 @@ class Job extends EditableModel {
       this.projectedEndDate,
       this.actualEndDate,
       this.customer,
-      this.receiptImageUrl});
+      this.customerId,
+      this.receiptImageUrl}) {
+    // If customer is provided, set customerId
+    if (customer != null && customerId == null) {
+      customerId = customer!.id;
+    }
+  }
 
   factory Job.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -40,7 +47,8 @@ class Job extends EditableModel {
         actualEndDate: data?['actualEndDate'] != null 
             ? (data!['actualEndDate'] as Timestamp).toDate() 
             : null,
-        customer: data?['customer'],
+        customerId: data?['customerId'],
+        // Note: customer object needs to be loaded separately if needed
         receiptImageUrl: data?['receiptImageUrl']);
   }
 
@@ -53,7 +61,7 @@ class Job extends EditableModel {
       if (startDate != null) "startDate": startDate,
       if (projectedEndDate != null) "projectedEndDate": projectedEndDate,
       if (actualEndDate != null) "actualEndDate": actualEndDate,
-      if (customer != null) "customer": customer,
+      if (customerId != null) "customerId": customerId,
       if(receiptImageUrl != null) "receiptImageUrl": receiptImageUrl
     };
   }
@@ -114,6 +122,7 @@ class Job extends EditableModel {
     DateTime? projectedEndDate,
     DateTime? actualEndDate,
     Customer? customer,
+    String? customerId,
     String? receiptImageUrl,
   }) {
     return Job(
@@ -125,6 +134,7 @@ class Job extends EditableModel {
       projectedEndDate: projectedEndDate ?? this.projectedEndDate,
       actualEndDate: actualEndDate ?? this.actualEndDate,
       customer: customer ?? this.customer,
+      customerId: customerId ?? this.customerId,
       receiptImageUrl: receiptImageUrl ?? this.receiptImageUrl,
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:applying_pressure/jobs/add_job_page.dart';
+import 'package:applying_pressure/jobs/job_info_page.dart';
 import '../test_helper.dart';
 import '../mocks/mock_auth_service.dart';
 
@@ -105,7 +106,7 @@ void main() {
       expect(find.text('Please enter Address:'), findsOneWidget);
     });
     
-    testWidgets('Should navigate back after successful job creation', 
+    testWidgets('Should navigate to job details after successful creation', 
         (WidgetTester tester) async {
       // Create a simple navigation stack to test
       await tester.pumpWidget(
@@ -149,12 +150,13 @@ void main() {
       final submitButton = find.widgetWithText(ElevatedButton, 'Submit');
       await tester.tap(submitButton);
       
-      // Wait for all animations and async operations to complete
-      await tester.pumpAndSettle();
+      // Wait for async operations and navigation
+      await tester.pump(); // Start the async operation
+      await tester.pump(const Duration(milliseconds: 100)); // Wait a bit
+      await tester.pump(); // Complete any remaining animations
 
-      // Should navigate back to the previous screen
-      expect(find.text('Go to Add Job'), findsOneWidget);
-      expect(find.byType(AddJobPage), findsNothing);
+      // Should navigate to JobInfoPage
+      expect(find.byType(JobInfoPage), findsOneWidget);
     });
   });
 

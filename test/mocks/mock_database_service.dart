@@ -25,7 +25,7 @@ class MockDatabaseService implements DatabaseServiceInterface {
   
   // Job operations
   @override
-  Future<void> addJob(Job jobData) async {
+  Future<Job> addJob(Job jobData) async {
     final newJob = Job(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: jobData.title,
@@ -34,10 +34,12 @@ class MockDatabaseService implements DatabaseServiceInterface {
       projectedEndDate: jobData.projectedEndDate,
       actualEndDate: jobData.actualEndDate,
       customer: jobData.customer,
+      customerId: jobData.customerId,
       receiptImageUrl: jobData.receiptImageUrl,
     );
     _jobs.add(newJob);
     _jobsController.add(List.from(_jobs));
+    return newJob;
   }
   
   @override

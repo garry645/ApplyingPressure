@@ -36,11 +36,14 @@ class FirebaseDatabaseService implements DatabaseServiceInterface {
 
   // Job operations
   @override
-  Future<void> addJob(Job jobData) async {
-    await _db.collection(currJobCollection).withConverter(
+  Future<Job> addJob(Job jobData) async {
+    final docRef = await _db.collection(currJobCollection).withConverter(
       fromFirestore: Job.fromFirestore,
       toFirestore: (Job job, _) => job.toFirestore(),
     ).add(jobData);
+    
+    // Return the job with the generated ID
+    return jobData.copyWith(id: docRef.id);
   }
 
   @override

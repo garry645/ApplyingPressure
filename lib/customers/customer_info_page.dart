@@ -1,6 +1,7 @@
 import 'package:applying_pressure/customers/customer.dart';
 import 'package:flutter/material.dart';
 
+import '../routes.dart';
 import '../strings.dart';
 import '../services/service_provider.dart';
 import '../shared/edit_form_page.dart';
@@ -89,7 +90,11 @@ class _CustomerInfoPageState extends State<CustomerInfoPage> {
                 textStyle: const TextStyle(fontSize: 20),
               ),
               onPressed: () {
-
+                Navigator.pushNamed(
+                  context,
+                  Routes.addJob,
+                  arguments: customer,
+                );
               },
               child: const Text('Create Job for Customer'),
             )
