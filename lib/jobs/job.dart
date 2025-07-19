@@ -6,7 +6,7 @@ import '../shared/editable_model.dart';
 class Job extends EditableModel {
   final String? id;
   final String title;
-  String status = "Pending";
+  String status = "Planned";
   final String? address;
   final DateTime? startDate;
   final DateTime? projectedEndDate;
@@ -18,7 +18,7 @@ class Job extends EditableModel {
   Job(
       {this.id,
       required this.title,
-      this.status = "Pending",
+      this.status = "Planned",
       required this.address,
       this.startDate,
       this.projectedEndDate,
@@ -40,7 +40,7 @@ class Job extends EditableModel {
     return Job(
         id: snapshot.id,
         title: data?['title'] ?? '',
-        status: data?['status'] ?? "Pending",
+        status: data?['status'] ?? "Planned",
         address: data?['address'] ?? '',
         startDate: data?['startDate'] != null ? (data!['startDate'] as Timestamp).toDate() : null,
         projectedEndDate: data?['projectedEndDate'] != null ? (data!['projectedEndDate'] as Timestamp).toDate() : null,

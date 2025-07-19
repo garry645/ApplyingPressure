@@ -149,14 +149,51 @@ class _JobsListPageState extends State<JobsListPage> {
           side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(5)),
       title: Text(job.title),
-      subtitle: Text(_formatDate(job.startDate) + "\n" +
-          _formatDate(job.projectedEndDate)),
-      trailing: const Icon(Icons.arrow_right_sharp),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Status: ${job.status}'),
+          Text('Start: ${_formatDate(job.startDate)}'),
+          Text('End: ${_formatDate(job.projectedEndDate)}'),
+        ],
+      ),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: _getStatusColor(job.status),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          job.status,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
   
   String _formatDate(DateTime? date) {
     if (date == null) return naString;
     return '${date.month}/${date.day}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+  
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Planned':
+        return Colors.orange;
+      case 'Started':
+        return Colors.blue;
+      case 'In Progress':
+        return Colors.green;
+      case 'Finished':
+        return Colors.grey;
+      case 'Pending':
+        return Colors.amber;
+      default:
+        return Colors.grey;
+    }
   }
 }

@@ -106,7 +106,7 @@ class _JobInfoPageState extends State<JobInfoPage> {
             child: Wrap(children: [
               Column(
                 children: [
-                  Text('Status: ${job.title}', style: subTitleText()),
+                  Text('Status: ${job.status}', style: subTitleText()),
                   const SizedBox(height: 8),
 
                   Text('Start Date: ${getJobStartDateString(job)}',
@@ -117,18 +117,9 @@ class _JobInfoPageState extends State<JobInfoPage> {
                 ],
               )
             ])),
-        TextButton(
-          style: TextButton.styleFrom(
-            textStyle: const TextStyle(fontSize: 20),
-          ),
-          onPressed: () {
-            //TODO
-            //job.status = "finished";
-            //service.updateJob(widget.job.id, widget.job);
-            setState(() {});
-          },
-          child: const Text('Finish Job'),
-        ),
+        const SizedBox(height: 20),
+        _buildStatusButtons(job),
+        const SizedBox(height: 10),
         IconButton(
             onPressed: () async {
               final pickedFile =
@@ -183,6 +174,97 @@ class _JobInfoPageState extends State<JobInfoPage> {
         '${job?.projectedEndDate?.hour.toString().padLeft(2, '0')}:${job?.projectedEndDate?.minute?.toString().padLeft(2, '0')}\n\n';
   }
 
+  Widget _buildStatusButtons(Job job) {
+    final statusFlow = ['Planned', 'Started', 'In Progress', 'Finished'];
+    final currentIndex = statusFlow.indexOf(job.status);
+    
+    // Determine next status
+    String? nextStatus;
+    String buttonText;
+    
+    if (currentIndex >= 0 && currentIndex < statusFlow.length - 1) {
+      nextStatus = statusFlow[currentIndex + 1];
+      buttonText = 'Mark as $nextStatus';
+    } else if (job.status == 'Pending') {
+      // Handle legacy "Pending" status
+      nextStatus = 'Planned';
+      buttonText = 'Start Planning';
+    } else if (job.status == 'Finished') {
+      // Cycle back to Planned
+      nextStatus = 'Planned';
+      buttonText = 'Reset to Planned';
+    } else {
+      buttonText = 'Job Completed';
+    }
+    
+    return Column(
+      children: [
+        // Show current status with appropriate color
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: _getStatusColor(job.status),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            'Current Status: ${job.status}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Status progression button
+        if (nextStatus != null)
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              minimumSize: const Size(200, 45),
+            ),
+            onPressed: () async {
+              try {
+                final updatedJob = job.copyWith(
+                  status: nextStatus,
+                  actualEndDate: nextStatus == 'Finished' ? DateTime.now() : 
+                                nextStatus == 'Planned' && job.status == 'Finished' ? null : 
+                                job.actualEndDate,
+                );
+                await databaseService.updateJob(job.id!, updatedJob);
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error updating job: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(buttonText),
+          ),
+      ],
+    );
+  }
+  
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Planned':
+        return Colors.orange;
+      case 'Started':
+        return Colors.blue;
+      case 'In Progress':
+        return Colors.green;
+      case 'Finished':
+        return Colors.grey;
+      case 'Pending':
+        return Colors.amber;
+      default:
+        return Colors.grey;
+    }
+  }
+
   void _navigateToEditPage(Job job) {
     Navigator.push(
       context,
@@ -201,6 +283,30 @@ class _JobInfoPageState extends State<JobInfoPage> {
               label: 'Address',
               hintText: 'Enter Job Address',
               isRequired: true,
+            ),
+            FormFieldConfig(
+              name: 'status',
+              label: 'Status',
+              hintText: 'Select Status',
+              initialValue: job.status,
+              customWidget: DropdownButtonFormField<String>(
+                value: job.status,
+                decoration: const InputDecoration(
+                  labelText: 'Status',
+                  border: OutlineInputBorder(),
+                ),
+                items: ['Pending', 'Planned', 'Started', 'In Progress', 'Finished']
+                    .map((status) => DropdownMenuItem(
+                          value: status,
+                          child: Text(status),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    FormDataUpdater.of(context)?.updateFormData('status', value);
+                  }
+                },
+              ),
             ),
             FormFieldConfig(
               name: 'startDate',
@@ -247,11 +353,13 @@ class _JobInfoPageState extends State<JobInfoPage> {
             return Job(
               id: job.id,
               title: formData['title']?.toString() ?? job.title,
+              status: formData['status']?.toString() ?? job.status,
               address: formData['address']?.toString() ?? job.address,
               startDate: formData['startDate'] as DateTime? ?? job.startDate,
               projectedEndDate: formData['projectedEndDate'] as DateTime? ?? job.projectedEndDate,
               actualEndDate: job.actualEndDate,
               customer: job.customer,
+              customerId: job.customerId,
               receiptImageUrl: job.receiptImageUrl,
             );
           },
